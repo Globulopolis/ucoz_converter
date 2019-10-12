@@ -78,9 +78,9 @@ Class ConverterCategories extends JApplicationCli
 
 		$config     = ConverterHelper::loadConfig();
 		$backupPath = Path::clean($config->get('backupPath') . '/_s1');
-		$loads      = ConverterHelper::loadBackupFile('/ld_ld.txt');
-		$news       = ConverterHelper::loadBackupFile('/nw_nw.txt');
-		$publ       = ConverterHelper::loadBackupFile('/pu_pu.txt');
+		$loads      = ConverterHelper::loadBackupFile($backupPath . '/ld_ld.txt');
+		$news       = ConverterHelper::loadBackupFile($backupPath . '/nw_nw.txt');
+		$publ       = ConverterHelper::loadBackupFile($backupPath . '/pu_pu.txt');
 		$categories = array();
 
 		if ($loads !== false)
