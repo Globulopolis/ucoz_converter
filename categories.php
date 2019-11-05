@@ -137,6 +137,9 @@ Class ConverterCategories extends JApplicationCli
 		{
 			$totalTitles = count($titles);
 			$i = 1;
+			echo "===============================\n"
+				. "$type\n"
+				. "===============================\n";
 
 			foreach ($titles as $key => $category)
 			{

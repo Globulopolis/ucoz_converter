@@ -28,11 +28,12 @@ class ConverterHelper
 	 * @param   boolean  $extra   Extra param. Use while processing news, loads, publications and blog. Replace Ucoz new
 	 *                            line(backslash + \n) by tag <newline> for avoid bugs and to replace later for
 	 *                            normal \n sybmol.
+	 * @param   boolean  $raw     Return just file content.
 	 *
-	 * @return  mixed  False if file inaccessible, array with rows otherwise.
+	 * @return  mixed  False if file inaccessible, array with rows or file content.
 	 * @since   0.1
 	 */
-	public static function loadBackupFile($file, $extra = false)
+	public static function loadBackupFile($file, $extra = false, $raw = false)
 	{
 		clearstatcache();
 		$file = Path::clean($file);
@@ -46,10 +47,13 @@ class ConverterHelper
 				$content = str_replace("\\\n", "<newline>", $content);
 			}
 
-			$content = explode("\n", $content);
+			if (!$raw)
+			{
+				$content = explode("\n", $content);
 
-			// Remove empty lines and reindex array.
-			$content = array_values(array_filter($content));
+				// Remove empty lines and reindex array.
+				$content = array_values(array_filter($content));
+			}
 
 			return $content;
 		}
