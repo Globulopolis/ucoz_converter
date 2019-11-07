@@ -131,7 +131,7 @@ Class ConverterCategories extends JApplicationCli
 		$totalRows     = array_sum(array_map('count', $categories));
 		$totalImported = 0;
 		$totalErrors   = 0;
-		$ids           = ConverterHelper::getIDs(__DIR__ . '/imports/categories_import.json');
+		$ids           = ConverterHelper::getAssocData(__DIR__ . '/imports/categories_import.json');
 
 		foreach ($categories as $type => $titles)
 		{
@@ -186,7 +186,7 @@ Class ConverterCategories extends JApplicationCli
 
 		// Store two dimensional array with type, Joomla ID, Ucoz ID as JSON.
 		// E.g.: array('news' => array('joomla_id' => 'ucoz_id', ...), ...)
-		ConverterHelper::saveIDs(__DIR__ . '/imports/categories_import.json', $ids);
+		ConverterHelper::saveAssocData(__DIR__ . '/imports/categories_import.json', $ids);
 
 		$execTime += microtime(true);
 		$execTime = sprintf('%f', $execTime);

@@ -99,8 +99,8 @@ Class ConverterUsers extends JApplicationCli
 			Log::ALL, 'converter'
 		);
 
-		$config     = ConverterHelper::loadConfig();
-		$backupPath = Path::clean($config->get('backupPath') . '/_s1');
+		$config       = ConverterHelper::loadConfig();
+		$backupPath   = Path::clean($config->get('backupPath') . '/_s1');
 		$this->config = $config;
 		$users        = ConverterHelper::loadBackupFile($backupPath . '/users.txt', false, true);
 		$usersParams  = ConverterHelper::loadBackupFile($backupPath . '/ugen.txt');
@@ -109,7 +109,7 @@ Class ConverterUsers extends JApplicationCli
 		if (is_file(__DIR__ . '/usergroups.json'))
 		{
 			$groupsContent = file_get_contents(__DIR__ . '/usergroups.json');
-			$this->groups = json_decode($groupsContent, true);
+			$this->groups  = json_decode($groupsContent, true);
 		}
 
 		// Load backup files for users and their params.
@@ -167,16 +167,11 @@ Class ConverterUsers extends JApplicationCli
 		$totalUsersImported = 0;
 		$totalUsersError    = 0;
 		$totalUsersBlocked  = 0;
-		$ids                = ConverterHelper::getIDs(__DIR__ . '/imports/users_import.json');
+		$ids                = ConverterHelper::getAssocData(__DIR__ . '/imports/users_import.json');
 
 		// Process users
 		foreach ($this->usersParams as $i => $line)
 		{
-			if ($i > 0)
-			{
-				break;
-			}
-
 			$columnUserParam = explode('|', $line);
 
 			// Search user params by username from users.txt file
@@ -271,7 +266,7 @@ Class ConverterUsers extends JApplicationCli
 
 		// Store two dimensional array with type, Joomla ID, Ucoz ID as JSON.
 		// E.g.: array('joomla_id' => 'ucoz_id', ...)
-		ConverterHelper::saveIDs(__DIR__ . '/imports/users_import.json', $ids);
+		ConverterHelper::saveAssocData(__DIR__ . '/imports/users_import.json', $ids);
 
 		$execTime += microtime(true);
 		$execTime = sprintf('%f', $execTime);

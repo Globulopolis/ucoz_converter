@@ -9,6 +9,7 @@
 
 defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
 use Joomla\CMS\Log\Log;
 use Joomla\Filesystem\File;
 use Joomla\Filesystem\Path;
@@ -62,16 +63,16 @@ class ConverterHelper
 	}
 
 	/**
-	 * Get assoc array of IDs with an old IDs from Ucoz and new IDs from Joomla.
+	 * Get assoc array of old data from Ucoz and new for Joomla.
 	 *
 	 * @param   string  $file   File.
 	 *
 	 * @return  array
 	 * @since   0.1
 	 */
-	public static function getIDs($file)
+	public static function getAssocData($file)
 	{
-		$ids  = array();
+		$list = array();
 		$file = Path::clean($file);
 
 		if (is_file($file))
@@ -80,7 +81,7 @@ class ConverterHelper
 
 			if ($content !== false)
 			{
-				$ids = json_decode($content, true);
+				$list = json_decode($content, true);
 			}
 		}
 		else
@@ -96,23 +97,23 @@ class ConverterHelper
 			}
 		}
 
-		return $ids;
+		return $list;
 	}
 
 	/**
-	 * Save assoc array of IDs with an old IDs from Ucoz and new IDs from Joomla as JSON.
+	 * Save assoc array of data to JSON.
 	 *
 	 * @param   string  $file   File.
-	 * @param   array   $ids    Array with IDs.
+	 * @param   array   $data   Array with data.
 	 *
 	 * @return  boolean
 	 * @since   0.1
 	 */
-	public static function saveIDs($file, $ids)
+	public static function saveAssocData($file, $data)
 	{
 		$file = Path::clean($file);
 
-		if (file_put_contents($file, json_encode($ids)))
+		if (file_put_contents($file, json_encode($data)))
 		{
 			return true;
 		}
