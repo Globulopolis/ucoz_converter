@@ -23,6 +23,15 @@ Before run you need to point where you backup folder is. To do this, open `confi
 
 If you want to create categories again, delete `categories_import.json` in `/imports` folder. You can do the same for other types(e.g. news, blogs, users).
 
+**Import users**
+
+Before starting import users create all needed additional fields for user in Joomla. After that fill in file `userfields.json` with proper field ids.
+Default file `userfields.json` from repo filled with IDs listed in screenshot below.
+
+![Image of user fields](https://raw.githubusercontent.com/Globulopolis/ucoz_converter/master/docs/Users%20Fields%20-%20Test%20-%20Administration%20for%20userfields.png)
+
+![Image of user fields](https://raw.githubusercontent.com/Globulopolis/ucoz_converter/master/docs/userfields_json.jpg)
+
 **Beware!!**
 
 Some content(users, categories or news) cannot be moved as 1:1. At least for users Ucoz does not validate email, Joomla does.
