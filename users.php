@@ -72,6 +72,12 @@ Class ConverterUsers extends JApplicationCli
 	protected $groups = null;
 
 	/**
+	 * @var    array   Additional fields data.
+	 * @since  0.1
+	 */
+	protected $fields = null;
+
+	/**
 	 * @var    mixed   Users file content as array of rows or just content.
 	 * @since  0.1
 	 */
@@ -82,6 +88,12 @@ Class ConverterUsers extends JApplicationCli
 	 * @since  0.1
 	 */
 	protected $usersParams = '';
+
+	/**
+	 * @var    object   Database object.
+	 * @since  0.1
+	 */
+	protected $db;
 
 	/**
 	 * Class constructor.
@@ -105,13 +117,6 @@ Class ConverterUsers extends JApplicationCli
 		$users        = ConverterHelper::loadBackupFile($backupPath . '/users.txt', false, true);
 		$usersParams  = ConverterHelper::loadBackupFile($backupPath . '/ugen.txt');
 
-		// Load file with usergroups association. Format: {ucoz_usergroup_id: joomla_usergroup_id, ...}
-		if (is_file(__DIR__ . '/usergroups.json'))
-		{
-			$groupsContent = file_get_contents(__DIR__ . '/usergroups.json');
-			$this->groups  = json_decode($groupsContent, true);
-		}
-
 		// Load backup files for users and their params.
 		if ($users !== false)
 		{
@@ -134,6 +139,13 @@ Class ConverterUsers extends JApplicationCli
 			Log::add($msg, Log::CRITICAL, 'converter');
 			jexit($msg . "\n");
 		}
+
+		// Load file with usergroups association. Format: {ucoz_usergroup_id: joomla_usergroup_id, ...}
+		$this->groups = ConverterHelper::getAssocData(__DIR__ . '/usergroups.json');
+
+		// Load file with user fields association. Format: {key: field_id, ...} - where: key - array key with data
+		// from users.txt file; field_id - field ID from joomla.
+		$this->fields = ConverterHelper::getAssocData(__DIR__ . '/userfields.json');
 	}
 
 	/**
@@ -149,18 +161,18 @@ Class ConverterUsers extends JApplicationCli
 	public function doExecute()
 	{
 		$execTime = -microtime(true);
-		$db       = Factory::getDbo();
+		$this->db = Factory::getDbo();
 		$lang     = Factory::getLanguage();
 		$lang->load('com_users');
 		$lang->load('lib_joomla');
 
 		// Get all usernames from database to check if user allready registered.
-		$query = $db->getQuery(true)
-			->select($db->quoteName('username'))
-			->from($db->quoteName('#__users'));
+		$query = $this->db->getQuery(true)
+			->select($this->db->quoteName('username'))
+			->from($this->db->quoteName('#__users'));
 
-		$db->setQuery($query);
-		$dbUsers = $db->loadColumn();
+		$this->db->setQuery($query);
+		$dbUsers = $this->db->loadColumn();
 
 		$filter             = new InputFilter;
 		$totalUsers         = count($this->usersParams);
@@ -172,19 +184,23 @@ Class ConverterUsers extends JApplicationCli
 		// Process users
 		foreach ($this->usersParams as $i => $line)
 		{
+			if ($i > 0)
+			{
+				break;
+			}
+
 			$columnUserParam = explode('|', $line);
 
 			// Search user params by username from users.txt file
-			preg_match('#' . preg_quote($columnUserParam[1]) . '(.*)\n#mu', $this->users, $matches);
+			preg_match('#^' . preg_quote($columnUserParam[1]) . '(.*)\n#mu', $this->users, $matches);
 
 			$columnUser = explode('|', $matches[0]);
 			$ucozUserId = $filter->clean($columnUserParam[0], 'int');
 			$username   = $filter->clean($columnUserParam[1], 'username');
 			$groupid    = $filter->clean($columnUserParam[2], 'int');
 			$msgLine    = ($i + 1) . ' of ' . $totalUsers . '. User: ';
-
-			$user     = new User;
-			$userData = new stdClass;
+			$user       = new User;
+			$userData   = new stdClass;
 
 			// Check if user is allready exists in Joomla database and do update.
 			if (in_array($username, $dbUsers))
@@ -192,10 +208,19 @@ Class ConverterUsers extends JApplicationCli
 				$userData->id = array_search($ucozUserId, $ids);
 			}
 
-			$userData->registerDate  = gmdate("Y-m-d H:i:s", $filter->clean(($columnUser[15] + date('Z')), 'int'));
-			$userData->lastvisitDate = gmdate("Y-m-d H:i:s", $filter->clean(($columnUser[25] + date('Z')), 'int'));
-			$userData->name          = $db->escape($columnUser[5]);
-			$userData->requireReset  = (int) $this->config['requirePassReset'];
+			// Sometimes array may differ
+			if (count($columnUser) > 27)
+			{
+				$userData->lastvisitDate = gmdate("Y-m-d H:i:s", $filter->clean(($columnUser[27] + date('Z')), 'int'));
+			}
+			else
+			{
+				$userData->lastvisitDate = gmdate("Y-m-d H:i:s", $filter->clean(($columnUser[25] + date('Z')), 'int'));
+			}
+
+			$userData->registerDate = gmdate("Y-m-d H:i:s", $filter->clean(($columnUser[15] + date('Z')), 'int'));
+			$userData->name         = $this->db->escape($columnUser[5]);
+			$userData->requireReset = (int) $this->config['requirePassReset'];
 
 			// Do not use a 'cmd' filter because it'll break username with non-latin chars
 			$userData->username = $username;
@@ -220,8 +245,10 @@ Class ConverterUsers extends JApplicationCli
 				$userData->groups[] = $this->getGroup($groupid);
 			}
 
-			$dispatcher = JEventDispatcher::getInstance();
+			$userData->avatar = $columnUser[3];
+
 			PluginHelper::importPlugin('user');
+			$dispatcher = JEventDispatcher::getInstance();
 			$results = $dispatcher->trigger('onContentPrepareData', array('com_users.registration', $userData));
 
 			$data             = (array) $userData;
@@ -251,10 +278,12 @@ Class ConverterUsers extends JApplicationCli
 
 					if (!empty($userData->id))
 					{
+						$this->saveExtraFields($columnUser, $userData->id, false);
 						$regTxt = 'Updated.';
 					}
 					else
 					{
+						$this->saveExtraFields($columnUser, $user->id, true);
 						$ids[$user->id] = $ucozUserId;
 						$regTxt = 'Registered.';
 					}
@@ -299,6 +328,76 @@ Class ConverterUsers extends JApplicationCli
 		}
 
 		return (int) $group;
+	}
+
+	/**
+	 * Save additional user info. This will save data only if field created in admin panel and userfields.json file is
+	 * filled with valid information.
+	 *
+	 * @param   array     $data    Field data.
+	 * @param   integer   $uid     User ID.
+	 * @param   boolean   $isNew   Insert or update rows.
+	 *
+	 * @return  boolean
+	 * @since   0.1
+	 */
+	protected function saveExtraFields(&$data, $uid, $isNew)
+	{
+		if ($this->config->get('doExtraFields') != 1)
+		{
+			return true;
+		}
+
+		if (empty($this->fields))
+		{
+			return false;
+		}
+
+		if ($isNew)
+		{
+			$query = $this->db->getQuery(true)
+				->insert($this->db->quoteName('#__fields_values'))
+				->columns($this->db->quoteName(array('field_id', 'item_id', 'value')));
+
+			foreach ($this->fields as $key => $fieldId)
+			{
+				$query->values("'" . (int) $fieldId . "', '" . $uid . "', '" . $this->db->escape($data[$key]) . "'");
+			}
+
+			$this->db->setQuery($query);
+
+			try
+			{
+				$this->db->execute();
+			}
+			catch (RuntimeException $e)
+			{
+				echo __LINE__ . " - " . $e->getMessage() . "\n";
+			}
+		}
+		else
+		{
+			foreach ($this->fields as $key => $fieldId)
+			{
+				$query = $this->db->getQuery(true)
+					->update($this->db->quoteName('#__fields_values'))
+					->set($this->db->quoteName('value') . " = '" . $this->db->escape($data[$key]) . "'")
+					->where($this->db->quoteName('field_id') . ' = ' . (int) $fieldId);
+
+				$this->db->setQuery($query);
+
+				try
+				{
+					$this->db->execute();
+				}
+				catch (RuntimeException $e)
+				{
+					echo __LINE__ . " - " . $e->getMessage() . "\n";
+				}
+			}
+		}
+
+		return true;
 	}
 }
 
