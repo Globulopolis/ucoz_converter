@@ -184,11 +184,6 @@ Class ConverterUsers extends JApplicationCli
 		// Process users
 		foreach ($this->usersParams as $i => $line)
 		{
-			if ($i > 0)
-			{
-				break;
-			}
-
 			$columnUserParam = explode('|', $line);
 
 			// Search user params by username from users.txt file
