@@ -355,49 +355,82 @@ Class ConverterUsers extends JApplicationCli
 
 		if ($isNew)
 		{
-			$query = $this->db->getQuery(true)
-				->insert($this->db->quoteName('#__fields_values'))
-				->columns($this->db->quoteName(array('field_id', 'item_id', 'value')));
-
-			foreach ($this->fields as $key => $fieldId)
-			{
-				$query->values("'" . (int) $fieldId . "', '" . $uid . "', '" . $this->db->escape($data[$key]) . "'");
-			}
-
-			$this->db->setQuery($query);
-
-			try
-			{
-				$this->db->execute();
-			}
-			catch (RuntimeException $e)
-			{
-				echo __LINE__ . " - " . $e->getMessage() . "\n";
-			}
+			$this->insertField($this->fields, $data, $uid);
 		}
 		else
 		{
-			foreach ($this->fields as $key => $fieldId)
+			$query = $this->db->getQuery(true)
+				->select($this->db->quoteName('field_id'))
+				->from($this->db->quoteName('#__fields_values'))
+				->where($this->db->quoteName('field_id') . ' IN (' . implode(',', array_values($this->fields)) . ')');
+			$this->db->setQuery($query);
+			$ids = $this->db->loadColumn();
+
+			// Test if we're trying to insert new fields into database.
+			$diffs = array_diff($this->fields, $ids);
+
+			if (count(array_diff($this->fields, $ids)) > 0)
 			{
-				$query = $this->db->getQuery(true)
-					->update($this->db->quoteName('#__fields_values'))
-					->set($this->db->quoteName('value') . " = '" . $this->db->escape($data[$key]) . "'")
-					->where($this->db->quoteName('field_id') . ' = ' . (int) $fieldId);
-
-				$this->db->setQuery($query);
-
-				try
+				$this->insertField($diffs, $data, $uid);
+			}
+			else
+			{
+				foreach ($this->fields as $key => $fieldId)
 				{
-					$this->db->execute();
-				}
-				catch (RuntimeException $e)
-				{
-					echo __LINE__ . " - " . $e->getMessage() . "\n";
+					$query = $this->db->getQuery(true)
+						->update($this->db->quoteName('#__fields_values'))
+						->set($this->db->quoteName('value') . " = '" . $this->db->escape($data[$key]) . "'")
+						->where($this->db->quoteName('field_id') . ' = ' . (int) $fieldId);
+
+					$this->db->setQuery($query);
+
+					try
+					{
+						$this->db->execute();
+					}
+					catch (RuntimeException $e)
+					{
+						echo __LINE__ . " - " . $e->getMessage() . "\n";
+					}
 				}
 			}
 		}
 
 		return true;
+	}
+
+	/**
+	 * Get a group ID from Joomla by old group ID from Ucoz.
+	 *
+	 * @param   array    $fields   Fields assoc array.
+	 * @param   mixed    $data     Field data.
+	 * @param   integer  $uid      User ID.
+	 *
+	 * @return  void
+	 * @since   0.1
+	 */
+	protected function insertField($fields, &$data, $uid)
+	{
+		$query = $this->db->getQuery(true)
+			->insert($this->db->quoteName('#__fields_values'))
+			->columns($this->db->quoteName(array('field_id', 'item_id', 'value')));
+
+		foreach ($fields as $key => $fieldId)
+		{
+			$value = is_array($data) ? $data[$key] : $data;
+			$query->values("'" . (int) $fieldId . "', '" . $uid . "', '" . $this->db->escape($value) . "'");
+		}
+
+		$this->db->setQuery($query);
+
+		try
+		{
+			$this->db->execute();
+		}
+		catch (RuntimeException $e)
+		{
+			echo __LINE__ . " - " . $e->getMessage() . "\n";
+		}
 	}
 }
 
