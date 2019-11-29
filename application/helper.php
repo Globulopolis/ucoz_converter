@@ -10,6 +10,7 @@
 defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
 use Joomla\CMS\Log\Log;
 use Joomla\Filesystem\File;
 use Joomla\Filesystem\Folder;
@@ -240,47 +241,123 @@ class ConverterHelper
 	}
 
 	/**
-	 * Get a new category ID from Joomla by old category ID from Ucoz.
+	 * Get Joomla category ID by Ucoz category ID.
 	 *
-	 * @param   integer  $category   Ucoz category ID.
-	 * @param   integer  $default    Default category ID from Joomla.
+	 * @param   array    $categories   Array with categories assoc data.
+	 * @param   integer  $id           Ucoz category ID.
+	 * @param   object   $config       Converter config object.
 	 *
 	 * @return  integer
 	 * @since   0.1
 	 */
-	public static function getCategory($category, $default)
+	public static function getCategory($categories, $id, $config)
 	{
-		// Get the default Joomla category ID for uncategorised articles.
-		if ($category <= 0)
+		// Default category ID for Uncategorised items in com_content. Hardcoded in Joomla installation package.
+		$category = 2;
+
+		if (array_key_exists($id, $categories))
 		{
-			// Try to get default category ID from file.
-			$defaultCategory = $default;
-
-			if (!empty($defaultCategory))
-			{
-				$category = $defaultCategory;
-			}
-			else
-			{
-				$db    = Factory::getDbo();
-				$query = $db->getQuery(true)
-					->select($db->quoteName('id'))
-					->from($db->quoteName('#__categories'))
-					->where($db->quoteName('extension') . " = 'com_content' AND " . $db->quoteName('path') . " = 'uncategorised'");
-
-				$db->setQuery($query);
-
-				try
-				{
-					$category = $db->loadResult();
-				}
-				catch (RuntimeException $e)
-				{
-					echo $e->getMessage();
-				}
-			}
+			$category = $categories[$id];
+		}
+		elseif ($config->get('blogDefaultCategoryId') > 0)
+		{
+			$category = $config->get('blogDefaultCategoryId');
 		}
 
 		return (int) $category;
+	}
+
+	/**
+	 * Generate alias.
+	 *
+	 * @param   array  $data   Item data.
+	 *
+	 * @return  string
+	 * @since   0.1
+	 */
+	public static function generateAlias($data)
+	{
+		if (Factory::getConfig()->get('unicodeslugs') == 1)
+		{
+			$data['alias'] = JFilterOutput::stringURLUnicodeSlug($data['title']);
+		}
+		else
+		{
+			$data['alias'] = JFilterOutput::stringURLSafe($data['title']);
+		}
+
+		$table = JTable::getInstance('Content', 'JTable');
+
+		if ($table->load(array('alias' => $data['alias'], 'catid' => $data['catid'])))
+		{
+			$msg = Text::_('COM_CONTENT_SAVE_WARNING') . "\n";
+		}
+
+		list($title, $alias) = self::generateNewTitle($data['catid'], $data['alias'], $data['title']);
+		$data['alias'] = $alias;
+
+		if (isset($msg))
+		{
+			echo $msg;
+		}
+
+		return $alias;
+	}
+
+	/**
+	 * Method to change the title & alias.
+	 *
+	 * @param   integer  $categoryID    The id of the category.
+	 * @param   string   $alias         The alias.
+	 * @param   string   $title         The title.
+	 *
+	 * @return	array  Contains the modified title and alias.
+	 *
+	 * @since	0.1
+	 */
+	public static function generateNewTitle($categoryID, $alias, $title)
+	{
+		// Alter the title & alias
+		$table = JTable::getInstance('Content', 'JTable');
+
+		while ($table->load(array('alias' => $alias, 'catid' => $categoryID)))
+		{
+			$title = StringHelper::increment($title);
+			$alias = StringHelper::increment($alias, 'dash');
+		}
+
+		return array($title, $alias);
+	}
+
+	/**
+	 * Replace site URL. Require to replace non-https URL in images or links.
+	 * Replace more URLs. Sometimes images or other content can be placed at root directory. So if we want to move all
+	 * these folders to, e.g. images we need to replace URLs to new location.
+	 *
+	 * @param   string  $text     Content where to replace.
+	 * @param   object  $config   Converter config object.
+	 *
+	 * @return  string
+	 * @since   0.1
+	 */
+	public static function replaceUrls($text, $config)
+	{
+		if ($config['replaceOldUrls'] == 1)
+		{
+			$text = str_ireplace(explode(',', $config['oldSiteURL']), $config['siteURL'], $text);
+		}
+
+		if ($config['replaceUrlsExtra'] == 1)
+		{
+			$search  = explode(',', $config['replaceUrlsExtraList']);
+			$replace = explode(',', $config['replaceUrlsExtraListBy']);
+
+			if (!empty($search) && !empty($replace))
+			{
+				$text = str_replace($search, $replace, $text);
+			}
+		}
+
+		return $text;
 	}
 }
