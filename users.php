@@ -96,6 +96,12 @@ Class ConverterUsers extends JApplicationCli
 	protected $db;
 
 	/**
+	 * @var    array   Holds IDs from #__fields_values table.
+	 * @since  0.1
+	 */
+	protected $fieldIds = array();
+
+	/**
 	 * Class constructor.
 	 *
 	 * @since   0.1
@@ -180,6 +186,7 @@ Class ConverterUsers extends JApplicationCli
 		$totalUsersError    = 0;
 		$totalUsersBlocked  = 0;
 		$ids                = ConverterHelper::getAssocData(__DIR__ . '/imports/users_import.json');
+		$regTxt             = '';
 
 		// Process users
 		foreach ($this->usersParams as $i => $line)
@@ -274,16 +281,16 @@ Class ConverterUsers extends JApplicationCli
 					if (!empty($userData->id))
 					{
 						$this->saveExtraFields($columnUser, $userData->id, false);
-						$regTxt = 'Updated.';
+						$regTxt = 'Updated';
 					}
 					else
 					{
 						$this->saveExtraFields($columnUser, $user->id, true);
 						$ids[$user->id] = $ucozUserId;
-						$regTxt = 'Registered.';
+						$regTxt = 'Registered';
 					}
 
-					echo $msgLine . $userData->username . ' - ' . $regTxt . "\n";
+					echo $msgLine . $userData->username . ' - ' . $regTxt . ".\n";
 				}
 			}
 		}
@@ -297,7 +304,7 @@ Class ConverterUsers extends JApplicationCli
 		list($sec, $usec) = explode('.', $execTime);
 
 		echo  "\n" . 'Total users: ' . $totalUsers . '.' .
-			  "\n" . 'Users imported: ' . $totalUsersImported . '.' .
+			  "\n" . 'Users ' . strtolower($regTxt) . ': ' . $totalUsersImported . '.' .
 			  "\n" . 'Banned users: ' . $totalUsersBlocked . '.' .
 			  "\n" . 'Errors found: ' . $totalUsersError . '. See logfile at ' .
 			  Path::clean(Factory::getConfig()->get('log_path') . '/users_import.php') .
@@ -354,17 +361,20 @@ Class ConverterUsers extends JApplicationCli
 		}
 		else
 		{
-			$query = $this->db->getQuery(true)
-				->select($this->db->quoteName('field_id'))
-				->from($this->db->quoteName('#__fields_values'))
-				->where($this->db->quoteName('field_id') . ' IN (' . implode(',', array_values($this->fields)) . ')');
-			$this->db->setQuery($query);
-			$ids = $this->db->loadColumn();
+			if (empty($this->fieldIds))
+			{
+				$query = $this->db->getQuery(true)
+					->select($this->db->quoteName('field_id'))
+					->from($this->db->quoteName('#__fields_values'))
+					->where($this->db->quoteName('field_id') . ' IN (' . implode(',', array_values($this->fields)) . ')');
+				$this->db->setQuery($query);
+				$this->fieldIds = $this->db->loadColumn();
+			}
 
 			// Test if we're trying to insert new fields into database.
-			$diffs = array_diff($this->fields, $ids);
+			$diffs = array_diff($this->fields, $this->fieldIds);
 
-			if (count(array_diff($this->fields, $ids)) > 0)
+			if (count($diffs) > 0)
 			{
 				$this->insertField($diffs, $data, $uid);
 			}
@@ -375,7 +385,8 @@ Class ConverterUsers extends JApplicationCli
 					$query = $this->db->getQuery(true)
 						->update($this->db->quoteName('#__fields_values'))
 						->set($this->db->quoteName('value') . " = '" . $this->db->escape($data[$key]) . "'")
-						->where($this->db->quoteName('field_id') . ' = ' . (int) $fieldId);
+						->where($this->db->quoteName('field_id') . ' = ' . (int) $fieldId)
+						->where($this->db->quoteName('item_id') . ' = ' . (int) $uid);
 
 					$this->db->setQuery($query);
 

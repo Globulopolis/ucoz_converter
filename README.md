@@ -32,6 +32,8 @@ Default file `userfields.json` from repo filled with IDs listed in screenshot be
 
 ![Image of user fields](https://raw.githubusercontent.com/Globulopolis/ucoz_converter/master/docs/userfields_json.jpg)
 
+**NB!** If `#__fields_values` table have tons of records when update all fields require some time(~1 sec per user for 6 fields). The more fields, the more time for updating. If you do not want(or not required) update these fields set `doExtraFields` option to 0.
+
 **Beware!!**
 
 Some content(users, categories or news) cannot be moved as 1:1. At least for users Ucoz does not validate email, Joomla does.
