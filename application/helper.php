@@ -9,8 +9,6 @@
 
 defined('_JEXEC') or die;
 
-use Joomla\CMS\Factory;
-use Joomla\CMS\Language\Text;
 use Joomla\CMS\Log\Log;
 use Joomla\Filesystem\File;
 use Joomla\Filesystem\Folder;
@@ -127,16 +125,44 @@ class ConverterHelper
 	/**
 	 * Load converter configuration.
 	 *
-	 * @return  object
+	 * @return  Registry
 	 * @since   0.1
 	 */
 	public static function loadConfig()
 	{
-		$registry = new Registry;
-		$config   = FOFUtilsIniParser::parse_ini_file(dirname(__DIR__) . '/config.ini', false);
-		$config   = $registry->loadArray($config);
+		require_once dirname(__DIR__) . '/config.php';
 
-		return $config;
+		$registry = new Registry;
+		$config   = new ConverterConfig;
+
+		// Process variables from repeatable fields
+		$config->userfields = json_decode($config->userfields);
+		$config->userfields = array_combine($config->userfields->userfields_pos, $config->userfields->userfields_id);
+		$config->usergroups = json_decode($config->usergroups);
+		$config->usergroups = array_combine($config->usergroups->usergroups_ucoz, $config->usergroups->usergroups_joomla);
+
+		return $registry->loadObject($config);
+	}
+
+	/**
+	 * Save converter configuration.
+	 *
+	 * @param   Registry  $config  A Registry object containing config data.
+	 *
+	 * @return  boolean
+	 * @since   0.1
+	 */
+	public static function saveConfig(Registry $config)
+	{
+		$file = dirname(__DIR__) . '/config.php';
+		$configuration = $config->toString('PHP', array('class' => 'JConfig', 'closingtag' => false));
+
+		if (!File::write($file, $configuration))
+		{
+			throw new RuntimeException(JText::_('COM_CONFIG_ERROR_WRITE_FAILED'));
+		}
+
+		return true;
 	}
 
 	/**
@@ -220,9 +246,10 @@ class ConverterHelper
 		return preg_replace_callback(
 			$pattern,
 			function ($matches) {
-				$accordionId    = 'ac_' . md5(microtime() . uniqid(mt_rand(), true));
-				$spoilerId      = 'sp_' . md5(microtime() . uniqid(mt_rand(), true));
-				$accordionGroup = '<div class="accordion" id="' . $accordionId . '">
+				$accordionId = 'ac_' . md5(microtime() . uniqid(mt_rand(), true));
+				$spoilerId   = 'sp_' . md5(microtime() . uniqid(mt_rand(), true));
+
+				return '<div class="accordion" id="' . $accordionId . '">
 					<div class="accordion-group">
 						<div class="accordion-heading">
 							<a href="#' . $spoilerId . '" class="accordion-toggle" data-toggle="collapse"
@@ -232,9 +259,7 @@ class ConverterHelper
 							<div class="accordion-inner">' . $matches[2] . '</div>
 						</div>
 					</div>
-				</div>' . "\n";
-
-				return $accordionGroup;
+				</div><br />';
 			},
 			$text
 		);
@@ -277,7 +302,7 @@ class ConverterHelper
 	 */
 	public static function generateAlias($data)
 	{
-		if (Factory::getConfig()->get('unicodeslugs') == 1)
+		if (JFactory::getConfig()->get('unicodeslugs') == 1)
 		{
 			$data['alias'] = JFilterOutput::stringURLUnicodeSlug($data['title']);
 		}
@@ -290,7 +315,7 @@ class ConverterHelper
 
 		if ($table->load(array('alias' => $data['alias'], 'catid' => $data['catid'])))
 		{
-			$msg = Text::_('COM_CONTENT_SAVE_WARNING') . "\n";
+			$msg = JText::_('COM_CONTENT_SAVE_WARNING') . "\n";
 		}
 
 		list($title, $alias) = self::generateNewTitle($data['catid'], $data['alias'], $data['title']);

@@ -151,7 +151,7 @@ Class ConverterCategories extends JApplicationCli
 				$table['published']       = 1;
 				$table['params']          = json_encode(array('category_layout' => '', 'image' => ''));
 				$table['metadata']        = json_encode(array('author' => '', 'robots' => ''));
-				$table['created_user_id'] = (int) $config->get('defaultUserId');
+				$table['created_user_id'] = (int) $config->get('categoriesUserId');
 
 				if (!empty($ids) && @array_key_exists($key, $ids[$type]))
 				{
