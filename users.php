@@ -67,7 +67,7 @@ catch (Exception $e)
 Class ConverterUsers extends JApplicationCli
 {
 	/**
-	 * @var    array   Configuration.
+	 * @var    object   Configuration.
 	 * @since  0.1
 	 */
 	protected $config;
@@ -165,10 +165,9 @@ Class ConverterUsers extends JApplicationCli
 
 				if ($_uid !== false)
 				{
-					$userData->id = $_uid;
+					$userData->id = (int) $_uid;
 				}
 			}
-
 
 			// Sometimes array may differ
 			if (count($columnUser) > 27)
@@ -191,7 +190,7 @@ Class ConverterUsers extends JApplicationCli
 			if (empty($userData->id))
 			{
 				$userData->groups   = array();
-				$userData->groups[] = $this->getGroup();
+				$userData->groups[] = $this->getDefaultUserGroup();
 			}
 
 			PluginHelper::importPlugin('user');
@@ -256,12 +255,12 @@ Class ConverterUsers extends JApplicationCli
 	}
 
 	/**
-	 * Get group ID from Joomla by old group ID from Ucoz.
+	 * Get default user group for all users.
 	 *
 	 * @return  integer
 	 * @since   0.1
 	 */
-	protected function getGroup()
+	protected function getDefaultUserGroup()
 	{
 		if (!empty($this->config->get('defaultUserGroupId')))
 		{
