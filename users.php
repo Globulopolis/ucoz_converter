@@ -39,12 +39,9 @@ if (!defined('_JDEFINES'))
 require_once JPATH_BASE . '/includes/framework.php';
 require_once __DIR__ . '/application/helper.php';
 
-use Joomla\CMS\Component\ComponentHelper;
-use Joomla\CMS\Language\Text;
-use Joomla\CMS\Log\Log;
+use Joomla\CMS\Factory;
 use Joomla\CMS\Plugin\PluginHelper;
 use Joomla\CMS\String\PunycodeHelper;
-use Joomla\CMS\User\User;
 use Joomla\Filesystem\Path;
 use Joomla\Filter\InputFilter;
 use Joomla\Utilities\ArrayHelper;
@@ -52,7 +49,7 @@ use Joomla\Utilities\ArrayHelper;
 // This will prevent 'Failed to start application' error.
 try
 {
-	$app = JFactory::getApplication('site');
+	$app = Factory::getApplication('site');
 }
 catch (Exception $e)
 {
@@ -85,27 +82,7 @@ Class ConverterUsers extends JApplicationCli
 	protected $db;
 
 	/**
-	 * Class constructor.
-	 *
-	 * @since   0.1
-	 */
-	public function __construct()
-	{
-		parent::__construct();
-
-		Log::addLogger(
-			array(
-				'text_file' => 'users_import.php'
-			),
-			Log::ALL, 'converter'
-		);
-	}
-
-	/**
 	 * Convert users and register in Joomla database.
-	 *
-	 * BEWARE! Cli script cannot register users into Super Users group because it's run not from Super User context.
-	 *         To fix this, run ugen.php script.
 	 *
 	 * @return  void
 	 * @throws  Exception
@@ -116,7 +93,6 @@ Class ConverterUsers extends JApplicationCli
 		$execTime = -microtime(true);
 		$this->db = JFactory::getDbo();
 		$lang     = JFactory::getLanguage();
-		$lang->load('com_users');
 		$lang->load('lib_joomla');
 
 		$config       = ConverterHelper::loadConfig();
@@ -126,9 +102,7 @@ Class ConverterUsers extends JApplicationCli
 
 		if ($users === false)
 		{
-			$msg = "Could not load backup file $backupPath/users.txt";
-			Log::add($msg, Log::CRITICAL, 'converter');
-			jexit($msg . "\n");
+			jexit("Could not load backup file $backupPath/users.txt\n");
 		}
 
 		// Load user fields association.
@@ -148,15 +122,42 @@ Class ConverterUsers extends JApplicationCli
 		$totalUsersError    = 0;
 		$ids                = ConverterHelper::getAssocData(__DIR__ . '/imports/users_import.json');
 		$regTxt             = '';
+		$outputLog          = "======= " . date('Y-m-d H:i:s', time()) . " =======\n";
 
 		// Process users
 		foreach ($users as $i => $line)
 		{
-			$columnUser = explode('|', $line);
-			$username   = $filter->clean($columnUser[0], 'username');
-			$msgLine    = ($i + 1) . ' of ' . $totalUsers . '. User: ';
-			$user       = new User;
-			$userData   = new stdClass;
+			$columnUser               = explode('|', $line);
+			$username                 = $filter->clean($columnUser[0], 'username');
+			$msgLine                  = ($i + 1) . ' of ' . $totalUsers . '. User: ';
+
+			$userData                 = array();
+			$userData['id']           = '';
+			$userData['name']         = $this->db->escape($columnUser[5]);
+			$userData['username']     = $username;
+			$userData['email']        = PunycodeHelper::emailToPunycode($columnUser[7]);
+			$userData['password']     = $columnUser[2];
+			$userData['block']        = 0;
+			$userData['sendEmail']    = 0;
+			$userData['registerDate'] = gmdate("Y-m-d H:i:s", $filter->clean(($columnUser[15] + date('Z')), 'int'));
+
+			// Sometimes array may differ
+			if (count($columnUser) > 27)
+			{
+				$userData['lastvisitDate'] = gmdate("Y-m-d H:i:s", $filter->clean(($columnUser[27] + date('Z')), 'int'));
+			}
+			else
+			{
+				$userData['lastvisitDate'] = gmdate("Y-m-d H:i:s", $filter->clean(($columnUser[25] + date('Z')), 'int'));
+			}
+
+			$userData['activation']    = 0;
+			$userData['params']        = '';
+			$userData['lastResetTime'] = $this->db->getNullDate();
+			$userData['resetCount']    = 0;
+			$userData['otpKey']        = '';
+			$userData['otep']          = '';
+			$userData['requireReset']  = (int) $this->config['requirePassReset'];
 
 			// Check if user is allready exists in Joomla database and set user ID.
 			if (in_array($username, $dbUsers))
@@ -165,114 +166,91 @@ Class ConverterUsers extends JApplicationCli
 
 				if ($_uid !== false)
 				{
-					$userData->id = (int) $_uid;
+					$userData['id'] = (int) $_uid;
 				}
-			}
-
-			// Sometimes array may differ
-			if (count($columnUser) > 27)
-			{
-				$userData->lastvisitDate = gmdate("Y-m-d H:i:s", $filter->clean(($columnUser[27] + date('Z')), 'int'));
-			}
-			else
-			{
-				$userData->lastvisitDate = gmdate("Y-m-d H:i:s", $filter->clean(($columnUser[25] + date('Z')), 'int'));
-			}
-
-			$userData->registerDate = gmdate("Y-m-d H:i:s", $filter->clean(($columnUser[15] + date('Z')), 'int'));
-			$userData->name         = $this->db->escape($columnUser[5]);
-			$userData->requireReset = (int) $this->config['requirePassReset'];
-			$userData->username     = $username;
-			$userData->password1    = $columnUser[2];
-			$userData->email        = PunycodeHelper::emailToPunycode($columnUser[7]);
-
-			// Do not update usergroup for allready registered user
-			if (empty($userData->id))
-			{
-				$userData->groups   = array();
-				$userData->groups[] = $this->getDefaultUserGroup();
 			}
 
 			PluginHelper::importPlugin('user');
 			$dispatcher = JEventDispatcher::getInstance();
 			$results = $dispatcher->trigger('onContentPrepareData', array('com_users.registration', $userData));
 
-			$data             = (array) $userData;
-			$data['password'] = $data['password1'];
+			$query = $this->db->getQuery(true);
 
-			if (!$user->bind($data))
+			if (empty($userData['id']))
 			{
-				$totalUsersError++;
-				$msg = $msgLine . $userData->username . ' - ' . Text::sprintf('COM_USERS_REGISTRATION_BIND_FAILED', $user->getError());
-				Log::add($msg, JLog::ERROR, 'converter');
-
-				echo $msg . "\n";
+				$query->insert($this->db->quoteName('#__users'))
+					->columns(
+						$this->db->quoteName(
+							array('id', 'name', 'username', 'email', 'password', 'block', 'sendEmail', 'registerDate',
+							'lastvisitDate', 'activation', 'params', 'lastResetTime', 'resetCount', 'otpKey', 'otep',
+							'requireReset')
+						)
+					)
+					->values("'" . implode("', '", $userData) . "'");
 			}
 			else
 			{
-				if (!$user->save())
-				{
-					$totalUsersError++;
-					$msg = $msgLine . $userData->username . ' - ' . Text::sprintf('COM_USERS_REGISTRATION_SAVE_FAILED', $user->getError());
-					Log::add($msg, JLog::ERROR, 'converter');
+				$query->update($this->db->quoteName('#__users'))
+					->set($this->db->quoteName('name') . " = '" . $userData['name'] . "'")
+					->set($this->db->quoteName('username') . " = '" . $userData['username'] . "'")
+					->set($this->db->quoteName('email') . " = '" . $userData['email'] . "'")
+					->set($this->db->quoteName('password') . " = '" . $userData['password'] . "'")
+					->where($this->db->quoteName('id') . ' = ' . (int) $userData['id']);
+			}
 
-					echo $msg . "\n";
+			$this->db->setQuery($query);
+
+			try
+			{
+				$this->db->execute();
+				$totalUsersImported++;
+
+				if (!empty($userData['id']))
+				{
+					$this->saveExtraFields($columnUser, $userData['id'], false);
+					$regTxt = 'Updated';
 				}
 				else
 				{
-					$totalUsersImported++;
-
-					if (!empty($userData->id))
-					{
-						$this->saveExtraFields($columnUser, $userData->id, false);
-						$regTxt = 'Updated';
-					}
-					else
-					{
-						$this->saveExtraFields($columnUser, $user->id, true);
-						$ids[$user->id] = $userData->username;
-						$regTxt = 'Registered';
-					}
-
-					echo $msgLine . $userData->username . ' - ' . $regTxt . ".\n";
+					$insertId = $this->db->insertid();
+					$this->saveExtraFields($columnUser, $insertId, true);
+					$ids[$insertId] = $userData['username'];
+					$regTxt = 'Registered';
 				}
+
+				$msg = $msgLine . $userData['username'] . ' - ' . $regTxt . ".\n";
+				$outputLog .= $msg;
+
+				echo $msg;
+			}
+			catch (RuntimeException $e)
+			{
+				$totalUsersError++;
+				$msg = $msgLine . $userData['username'] . ' - ' . $e->getMessage();
+				$outputLog .= $msg;
+
+				echo $msg . "\n";
 			}
 		}
 
-		// Store two dimensional array with type, Joomla ID, Ucoz ID as JSON.
-		// E.g.: array('joomla_id' => 'ucoz_id', ...)
+		// Store in array Joomla ID, Ucoz username as JSON.
+		// E.g.: array('joomla_id' => 'ucoz_username', ...)
 		ConverterHelper::saveAssocData(__DIR__ . '/imports/users_import.json', $ids);
 
 		$execTime += microtime(true);
 		$execTime = sprintf('%f', $execTime);
 		list($sec, $usec) = explode('.', $execTime);
 
-		echo  "\n" . 'Total users: ' . $totalUsers . '.' .
+		$succMsg = "\n" . 'Total users: ' . $totalUsers . '.' .
 			  "\n" . 'Users ' . strtolower($regTxt) . ': ' . $totalUsersImported . '.' .
 			  "\n" . 'Errors found: ' . $totalUsersError . '. See logfile at ' .
-			  Path::clean(JFactory::getConfig()->get('log_path') . '/users_import.php') .
+			  Path::clean(__DIR__ . '/imports/users_import.log') .
 			  "\n" . 'Took: ' . number_format($sec / 60, 2) . 'min';
-	}
+		$outputLog .= $succMsg;
 
-	/**
-	 * Get default user group for all users.
-	 *
-	 * @return  integer
-	 * @since   0.1
-	 */
-	protected function getDefaultUserGroup()
-	{
-		if (!empty($this->config->get('defaultUserGroupId')))
-		{
-			$group = $this->config->get('defaultUserGroupId');
-		}
-		else
-		{
-			$userParams = ComponentHelper::getParams('com_users');
-			$group = $userParams->get('new_usertype', $userParams->get('guest_usergroup', 1));
-		}
+		file_put_contents(__DIR__ . '/imports/users_import.log', $outputLog . "\n\n", FILE_APPEND);
 
-		return (int) $group;
+		echo $succMsg;
 	}
 
 	/**
@@ -347,7 +325,7 @@ Class ConverterUsers extends JApplicationCli
 	}
 
 	/**
-	 * Get a group ID from Joomla by old group ID from Ucoz.
+	 * Insert new field infromation.
 	 *
 	 * @param   array    $fields   Fields assoc array.
 	 * @param   mixed    $data     Field data.
