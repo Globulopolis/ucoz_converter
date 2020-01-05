@@ -96,13 +96,13 @@ Class ConverterUsers extends JApplicationCli
 		$lang->load('lib_joomla');
 
 		$config       = ConverterHelper::loadConfig();
-		$backupPath   = Path::clean($config->get('backupPath') . '/_s1');
+		$backupPath   = Path::clean($config->get('backupPath') . '/_s1/users.txt');
 		$this->config = $config;
-		$users        = ConverterHelper::loadBackupFile($backupPath . '/users.txt');
+		$users        = ConverterHelper::loadBackupFile($backupPath);
 
 		if ($users === false)
 		{
-			jexit("Could not load backup file $backupPath/users.txt\n");
+			jexit("Could not load backup file at $backupPath\n");
 		}
 
 		// Load user fields association.
@@ -243,8 +243,7 @@ Class ConverterUsers extends JApplicationCli
 
 		$succMsg = "\n" . 'Total users: ' . $totalUsers . '.' .
 			  "\n" . 'Users ' . strtolower($regTxt) . ': ' . $totalUsersImported . '.' .
-			  "\n" . 'Errors found: ' . $totalUsersError . '. See logfile at ' .
-			  Path::clean(__DIR__ . '/imports/users_import.log') .
+			  "\n" . 'Errors found: ' . $totalUsersError .
 			  "\n" . 'Took: ' . number_format($sec / 60, 2) . 'min';
 		$outputLog .= $succMsg;
 
