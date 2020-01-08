@@ -218,19 +218,16 @@ Class ConverterUsers extends JApplicationCli
 					$regTxt = 'Registered';
 				}
 
-				$msg = $msgLine . $userData['username'] . ' - ' . $regTxt . ".\n";
-				$outputLog .= $msg;
-
-				echo $msg;
+				$msg = $msgLine . $userData['username'] . ' - ' . $regTxt;
 			}
 			catch (RuntimeException $e)
 			{
 				$totalUsersError++;
 				$msg = $msgLine . $userData['username'] . ' - ' . $e->getMessage();
-				$outputLog .= $msg;
-
-				echo $msg . "\n";
 			}
+
+			$outputLog .= $msg . "\n";
+			echo $msg . "\n";
 		}
 
 		// Store in array Joomla ID, Ucoz username as JSON.

@@ -42,8 +42,15 @@ use Joomla\CMS\Log\Log;
 use Joomla\Filesystem\Path;
 use Joomla\Filter\InputFilter;
 
-// This line will prevent 'Failed to start application' error.
-$app = Factory::getApplication('site');
+// This will prevent 'Failed to start application' error.
+try
+{
+	$app = Factory::getApplication('site');
+}
+catch (Exception $e)
+{
+	jexit($e->getMessage());
+}
 
 /**
  * Class for categories.
@@ -62,13 +69,7 @@ Class ConverterCategories extends JApplicationCli
 	public function doExecute()
 	{
 		$execTime  = -microtime(true);
-
-		Log::addLogger(
-			array(
-				'text_file' => 'categories_import.php'
-			),
-			Log::ALL, 'converter'
-		);
+		$outputLog = "======= " . date('Y-m-d H:i:s', time()) . " =======\n";
 
 		JLoader::register('CategoriesHelper', JPATH_ADMINISTRATOR . '/components/com_categories/helpers/categories.php');
 
@@ -94,7 +95,7 @@ Class ConverterCategories extends JApplicationCli
 		else
 		{
 			$msg = "Could not load backup file $backupPath/ld_ld.txt";
-			Log::add($msg, Log::CRITICAL, 'converter');
+			$outputLog .= $msg;
 			echo "\n$msg\n";
 		}
 
@@ -109,7 +110,7 @@ Class ConverterCategories extends JApplicationCli
 		else
 		{
 			$msg = "Could not load backup file $backupPath/nw_nw.txt";
-			Log::add($msg, Log::CRITICAL, 'converter');
+			$outputLog .= $msg;
 			echo "\n$msg\n";
 		}
 
@@ -124,7 +125,7 @@ Class ConverterCategories extends JApplicationCli
 		else
 		{
 			$msg = "Could not load backup file $backupPath/pu_pu.txt";
-			Log::add($msg, Log::CRITICAL, 'converter');
+			$outputLog .= $msg;
 			echo "\n$msg\n";
 		}
 
@@ -167,18 +168,20 @@ Class ConverterCategories extends JApplicationCli
 
 				if (!empty($catid))
 				{
+					$totalImported++;
 					$ids[$type][$key] = $catid;
 					$txt = $isNew ? ' - imported.' : ' - updated.';
-					echo $i . ' of ' . $totalTitles . '. Category: "' . $category . $txt . "\n";
-					$totalImported++;
+					$msg = $i . ' of ' . $totalTitles . '. Category: "' . $category . $txt . "\n";
+					$outputLog .= $msg;
 				}
 				else
 				{
-					$msg = '. Category: "' . $category . '" - error(possible duplicate title).' . "\n";
-					Log::add($msg, Log::CRITICAL, 'converter');
-					echo $i . ' of ' . $totalTitles . $msg;
 					$totalErrors++;
+					$msg = $i . ' of ' . $totalTitles . '. Category: "' . $category . '" - error(possible duplicate title).' . "\n";
+					$outputLog .= $msg;
 				}
+
+				echo $msg;
 
 				$i++;
 			}
@@ -192,11 +195,15 @@ Class ConverterCategories extends JApplicationCli
 		$execTime = sprintf('%f', $execTime);
 		list($sec, $usec) = explode('.', $execTime);
 
-		echo  "\n" . 'Total categories: ' . $totalRows . '.' .
+		$succMsg = "\n" . 'Total categories: ' . $totalRows . '.' .
 			  "\n" . 'Categories imported: ' . $totalImported . '.' .
-			  "\n" . 'Errors found: ' . $totalErrors . '. See logfile at ' .
-			  Path::clean(Factory::getConfig()->get('log_path') . '/categories_import.php') .
+			  "\n" . 'Errors found: ' . $totalErrors .
 			  "\n" . 'Took: ' . number_format($sec / 60, 2) . 'min';
+		$outputLog .= $succMsg;
+
+		file_put_contents(__DIR__ . '/imports/categories_import.log', $outputLog . "\n\n", FILE_APPEND);
+
+		echo $succMsg;
 	}
 }
 

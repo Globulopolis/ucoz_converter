@@ -136,10 +136,17 @@ class ConverterHelper
 		$config   = new ConverterConfig;
 
 		// Process variables from repeatable fields
-		$config->userfields = json_decode($config->userfields);
-		$config->userfields = array_combine($config->userfields->userfields_pos, $config->userfields->userfields_id);
-		$config->usergroups = json_decode($config->usergroups);
-		$config->usergroups = array_combine($config->usergroups->usergroups_ucoz, $config->usergroups->usergroups_joomla);
+		if (isset($config->userfields) && !empty($config->userfields))
+		{
+			$config->userfields = json_decode($config->userfields);
+			$config->userfields = array_combine($config->userfields->userfields_pos, $config->userfields->userfields_id);
+		}
+
+		if (isset($config->usergroups) && !empty($config->usergroups))
+		{
+			$config->usergroups = json_decode($config->usergroups);
+			$config->usergroups = array_combine($config->usergroups->usergroups_ucoz, $config->usergroups->usergroups_joomla);
+		}
 
 		return $registry->loadObject($config);
 	}
@@ -203,9 +210,7 @@ class ConverterHelper
 			throw new Exception('No cryptographically secure random function available');
 		}
 
-		$uid = substr(bin2hex($bytes), 0, $lenght);
-
-		return $uid;
+		return substr(bin2hex($bytes), 0, $lenght);
 	}
 
 	/**
