@@ -39,7 +39,7 @@ if (!defined('_JDEFINES'))
 require_once JPATH_BASE . '/includes/framework.php';
 require_once __DIR__ . '/application/helper.php';
 
-use Joomla\CMS\Language\Text;
+use Joomla\CMS\Factory;
 use Joomla\Filesystem\Path;
 use Joomla\Filter\InputFilter;
 use Joomla\Utilities\ArrayHelper;
@@ -47,7 +47,7 @@ use Joomla\Utilities\ArrayHelper;
 // This will prevent 'Failed to start application' error.
 try
 {
-	$app = JFactory::getApplication('site');
+	$app = Factory::getApplication('site');
 }
 catch (Exception $e)
 {

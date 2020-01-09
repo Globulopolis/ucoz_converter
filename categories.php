@@ -38,7 +38,6 @@ require_once JPATH_BASE . '/includes/framework.php';
 require_once __DIR__ . '/application/helper.php';
 
 use Joomla\CMS\Factory;
-use Joomla\CMS\Log\Log;
 use Joomla\Filesystem\Path;
 use Joomla\Filter\InputFilter;
 

@@ -9,7 +9,6 @@
 
 defined('_JEXEC') or die;
 
-use Joomla\CMS\Log\Log;
 use Joomla\Filesystem\File;
 use Joomla\Filesystem\Folder;
 use Joomla\Filesystem\Path;
@@ -91,10 +90,7 @@ class ConverterHelper
 
 			if (File::write($file, $content) === false)
 			{
-				Log::add('Could not save file ' . $file, Log::ERROR, 'converter');
-
-				echo 'Could not save file ' . $file . "\n";
-				jexit();
+				jexit("Could not save file $file\n");
 			}
 		}
 

@@ -91,8 +91,8 @@ Class ConverterUsers extends JApplicationCli
 	public function doExecute()
 	{
 		$execTime = -microtime(true);
-		$this->db = JFactory::getDbo();
-		$lang     = JFactory::getLanguage();
+		$this->db = Factory::getDbo();
+		$lang     = Factory::getLanguage();
 		$lang->load('lib_joomla');
 
 		$config       = ConverterHelper::loadConfig();
