@@ -267,17 +267,58 @@ class ConverterHelper
 	}
 
 	/**
+	 * Load categories from source.
+	 *
+	 * @param   string    $type    Content type. Can be 'blog', 'publ', 'loads', 'news'.
+	 * @param   Registry  $config  Converter config object.
+	 *
+	 * @return  array
+	 * @since   0.1
+	 */
+	public static function loadCategories($type, $config)
+	{
+		$categories = array();
+
+		if ((int) $config->get('fromCategoryImports') === 0)
+		{
+			$_categories = $config->get('categoriesAssoc');
+
+			if (!empty($_categories))
+			{
+				$_categories = json_decode($_categories);
+				$categories  = array_combine($_categories->categories_ucoz, $_categories->categories_joomla);
+			}
+		}
+		elseif ((int) $config->get('fromCategoryImports') === 1)
+		{
+			if (is_file(Path::clean(JPATH_ROOT . '/cli/ucoz_converter/imports/categories_import.json')))
+			{
+				$categories = self::getAssocData(JPATH_ROOT . '/cli/ucoz_converter/imports/categories_import.json');
+
+				if (array_key_exists($type, $categories))
+				{
+					$categories = $categories[$type];
+				}
+			}
+		}
+
+		return $categories;
+	}
+
+	/**
 	 * Get Joomla category ID by Ucoz category ID.
 	 *
-	 * @param   array    $categories   Array with categories assoc data.
-	 * @param   integer  $id           Ucoz category ID.
-	 * @param   object   $config       Converter config object.
+	 * @param   integer   $id           Ucoz category ID.
+	 * @param   string    $type         Content type. Can be 'blog', 'publ', 'loads', 'news'.
+	 * @param   Registry  $config       Converter config object.
 	 *
 	 * @return  integer
 	 * @since   0.1
 	 */
-	public static function getCategory($categories, $id, $config)
+	public static function getCategory($id, $type, $config)
 	{
+		$categories = self::loadCategories($type, $config);
+
 		// Default category ID for Uncategorised items in com_content. Hardcoded in Joomla installation package.
 		$category = 2;
 
