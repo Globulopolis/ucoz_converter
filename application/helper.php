@@ -37,7 +37,17 @@ class ConverterHelper
 	public static function loadBackupFile($file, $extra = false, $raw = false)
 	{
 		clearstatcache();
-		$file = Path::clean($file);
+
+		try
+		{
+			$file = Path::clean($file);
+		}
+		catch (UnexpectedValueException $e)
+		{
+			echo $e->getMessage() . "\n";
+
+			return false;
+		}
 
 		if (is_file($file))
 		{
@@ -150,7 +160,7 @@ class ConverterHelper
 	/**
 	 * Save converter configuration.
 	 *
-	 * @param   Registry  $config  A Registry object containing config data.
+	 * @param   Registry  $config   Registry object containing config data.
 	 *
 	 * @return  boolean
 	 * @since   0.1
@@ -166,20 +176,6 @@ class ConverterHelper
 		}
 
 		return true;
-	}
-
-	/**
-	 * Strip introtext from fulltext to avoid text duplicates while view a full article.
-	 *
-	 * @param   string  $intro    Introtext.
-	 * @param   string  $full     Fulltext.
-	 *
-	 * @return  string  Return fulltext w/o intotext.
-	 * @since   0.1
-	 */
-	public static function removeIntro($intro, $full)
-	{
-		return StringHelper::str_ireplace($intro, '', $full);
 	}
 
 	/**
@@ -219,7 +215,16 @@ class ConverterHelper
 	 */
 	public static function listFolders($path)
 	{
-		$path = Path::clean($path);
+		try
+		{
+			$path = Path::clean($path);
+		}
+		catch (UnexpectedValueException $e)
+		{
+			echo $e->getMessage() . "\n";
+
+			return false;
+		}
 
 		if (is_dir($path))
 		{
@@ -234,43 +239,10 @@ class ConverterHelper
 	}
 
 	/**
-	 * Replace spoiler.
-	 *
-	 * @param   string  $text      Spoiler text.
-	 * @param   string  $pattern   Pattern.
-	 *
-	 * @return  string
-	 * @since   0.1
-	 */
-	public static function replaceSpoiler($text, $pattern)
-	{
-		return preg_replace_callback(
-			$pattern,
-			function ($matches) {
-				$accordionId = 'ac_' . md5(microtime() . uniqid(mt_rand(), true));
-				$spoilerId   = 'sp_' . md5(microtime() . uniqid(mt_rand(), true));
-
-				return '<div class="accordion" id="' . $accordionId . '">
-					<div class="accordion-group">
-						<div class="accordion-heading">
-							<a href="#' . $spoilerId . '" class="accordion-toggle" data-toggle="collapse"
-							   data-parent="#' . $accordionId . '">' . $matches[4] . '</a>
-						</div>
-						<div id="' . $spoilerId . '" class="accordion-body collapse">
-							<div class="accordion-inner">' . $matches[2] . '</div>
-						</div>
-					</div>
-				</div><br />';
-			},
-			$text
-		);
-	}
-
-	/**
 	 * Load categories from source.
 	 *
-	 * @param   string    $type    Content type. Can be 'blog', 'publ', 'loads', 'news'.
-	 * @param   Registry  $config  Converter config object.
+	 * @param   string    $type     Content type. Can be 'blog', 'publ', 'loads', 'news'.
+	 * @param   Registry  $config   Converter config object.
 	 *
 	 * @return  array
 	 * @since   0.1
@@ -308,9 +280,9 @@ class ConverterHelper
 	/**
 	 * Get Joomla category ID by Ucoz category ID.
 	 *
-	 * @param   integer   $id           Ucoz category ID.
-	 * @param   string    $type         Content type. Can be 'blog', 'publ', 'loads', 'news'.
-	 * @param   Registry  $config       Converter config object.
+	 * @param   integer   $id       Ucoz category ID.
+	 * @param   string    $type     Content type. Can be 'blog', 'publ', 'loads', 'news'.
+	 * @param   Registry  $config   Converter config object.
 	 *
 	 * @return  integer
 	 * @since   0.1
@@ -374,9 +346,9 @@ class ConverterHelper
 	/**
 	 * Method to change the title & alias.
 	 *
-	 * @param   integer  $categoryID    The id of the category.
-	 * @param   string   $alias         The alias.
-	 * @param   string   $title         The title.
+	 * @param   integer  $categoryID   The id of the category.
+	 * @param   string   $alias        Alias.
+	 * @param   string   $title        Title.
 	 *
 	 * @return	array  Contains the modified title and alias.
 	 *
@@ -397,27 +369,84 @@ class ConverterHelper
 	}
 
 	/**
+	 * Replace smiles.
+	 *
+	 * @param   string    $text     Content where to replace.
+	 * @param   Registry  $config   Converter config object.
+	 *
+	 * @return  string
+	 * @since   0.1
+	 */
+	public static function replaceSmiles($text, $config)
+	{
+		$imgUrlSmiles = $config->get('siteURL') . $config->get('imgPathSmiles');
+		$pattern  = '#<img[^>]+src="(.+?)\/sm\/(.+?)\/(.+?).gif"[^>]+>#';
+		$replace  = '<img src="' . $imgUrlSmiles . '$3.gif" alt="$3" align="absmiddle" border="0">';
+
+		return preg_replace($pattern, $replace, $text);
+	}
+
+	/**
+	 * Replace Ucoz spolier by Bootstrap accordion(v. 2.3.2) which included in Joomla 3.x.
+	 * Each spolier will be replaced by new accordion group.
+	 *
+	 * @param   string  $text      Spoiler text.
+	 * @param   string  $pattern   Pattern.
+	 *
+	 * @return  string
+	 * @since   0.1
+	 */
+	public static function replaceSpoiler($text, $pattern = '')
+	{
+		if (empty($pattern))
+		{
+			$pattern = '@<!--uSpoiler-->(.+?)<!--ust-->(.*?)<!--\/ust-->(.*?)<!--usn\(=(.+?)\)-->(.+?)<!--\/uSpoiler-->@u';
+		}
+
+		return preg_replace_callback(
+			$pattern,
+			function ($matches) {
+				$accordionId = 'ac_' . md5(microtime() . uniqid(mt_rand(), true));
+				$spoilerId   = 'sp_' . md5(microtime() . uniqid(mt_rand(), true));
+
+				return '<div class="accordion" id="' . $accordionId . '">
+					<div class="accordion-group">
+						<div class="accordion-heading">
+							<a href="#' . $spoilerId . '" class="accordion-toggle" data-toggle="collapse"
+							   data-parent="#' . $accordionId . '">' . $matches[4] . '</a>
+						</div>
+						<div id="' . $spoilerId . '" class="accordion-body collapse">
+							<div class="accordion-inner">' . $matches[2] . '</div>
+						</div>
+					</div>
+				</div><br />';
+			},
+			$text
+		);
+	}
+
+	/**
 	 * Replace site URL. Require to replace non-https URL in images or links.
 	 * Replace more URLs. Sometimes images or other content can be placed at root directory. So if we want to move all
 	 * these folders to, e.g. images we need to replace URLs to new location.
 	 *
-	 * @param   string  $text     Content where to replace.
-	 * @param   object  $config   Converter config object.
+	 * @param   string    $text     Content where to replace.
+	 * @param   Registry  $config   Converter config object.
 	 *
 	 * @return  string
 	 * @since   0.1
 	 */
 	public static function replaceUrls($text, $config)
 	{
-		if ($config['replaceOldUrls'] == 1)
+		if ($config->get('replaceOldUrls') == 1)
 		{
-			$text = str_ireplace(explode(',', $config['oldSiteURL']), $config['siteURL'], $text);
+			$text = str_ireplace(explode(',', $config->get('oldSiteURL')), $config->get('siteURL'), $text);
 		}
 
-		if ($config['replaceUrlsExtra'] == 1)
+		if ($config->get('replaceUrlsExtra') == 1)
 		{
-			$search  = explode(',', $config['replaceUrlsExtraList']);
-			$replace = explode(',', $config['replaceUrlsExtraListBy']);
+			$search  = explode(',', $config->get('replaceUrlsExtraList'));
+			$replace = explode(',', $config->get('replaceUrlsExtraListBy'));
 
 			if (!empty($search) && !empty($replace))
 			{

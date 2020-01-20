@@ -33,6 +33,8 @@ class ConverterConfig {
 	public $userfields = '{"userfields_pos":["3","22","5","6","8","13"],"userfields_id":["1","2","3","4","5","6"]}';
 	public $usergroups = '{"usergroups_ucoz":["1","2","3","4","5","6","7","8","9","10","11","251","255"],"usergroups_joomla":["1","2","6","8","7","3","5","5","6","2","2","2","2"]}';
 	public $filterText = '0';
-	public $introFromFulltext = '0';
-	public $stripIntro = '0';
+	public $introFromFulltext = '1';
+	public $imgAttachCopy = '1';
+	public $imgAttachFilesPerFolder = '4000';
+	public $imgThumbWidth = '200';
 }
