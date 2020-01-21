@@ -158,27 +158,6 @@ class ConverterHelper
 	}
 
 	/**
-	 * Save converter configuration.
-	 *
-	 * @param   Registry  $config   Registry object containing config data.
-	 *
-	 * @return  boolean
-	 * @since   0.1
-	 */
-	public static function saveConfig(Registry $config)
-	{
-		$file = dirname(__DIR__) . '/config.php';
-		$configuration = $config->toString('PHP', array('class' => 'JConfig', 'closingtag' => false));
-
-		if (!File::write($file, $configuration))
-		{
-			throw new RuntimeException(JText::_('COM_CONFIG_ERROR_WRITE_FAILED'));
-		}
-
-		return true;
-	}
-
-	/**
 	 * Generate UID.
 	 *
 	 * @param   integer  $lenght   Length.

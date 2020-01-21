@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<metafile
+	version="3.6"
+	client="installation">
+	<name>English (United Kingdom)</name>
+	<version>0.1</version>
+	<creationDate>Jan 2020</creationDate>
+	<author>Libra.ms</author>
+	<copyright>Copyright (C) 2020 Libra.ms. All rights reserved.</copyright>
+	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
+	<files>
+		<filename>en-GB.ini</filename>
+	</files>
+	<metadata>
+		<name>English (en-GB)</name>
+		<nativeName>English (United Kingdom)</nativeName>
+		<tag>en-GB</tag>
+		<rtl>0</rtl>
+	</metadata>
+	<params />
+</metafile>

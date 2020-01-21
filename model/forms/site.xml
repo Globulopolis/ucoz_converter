@@ -1,0 +1,601 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+	<fieldset name="main" addfieldpath="ucoz_converter/model/fields/">
+		<field
+				name="language"
+				type="installation.language"
+				label="INSTL_LANGUAGE_LABEL"
+				id="language"
+				class="chzn-select-deselect"
+				size="20"
+				default="en-GB"
+				onchange="Install.setlanguage();"
+		/>
+
+		<field
+				name="backupPath"
+				type="text"
+				label="INSTL_BACKUP_PATH_LABEL"
+				description="INSTL_BACKUP_PATH_DESC"
+				id="backup_path"
+				class="span12"
+				required="true"
+		/>
+
+		<field
+				name="fromCategoryImports"
+				type="list"
+				label="INSTL_CATEGORY_GETFROM_LABEL"
+				description="INSTL_CATEGORY_GETFROM_DESC"
+				default="1"
+				class="chzn-select-deselect span6"
+				size="1"
+		>
+			<option value="0">JDEFAULT</option>
+			<option value="1">INSTL_CATEGORY_GETFROM_ITEM_1</option>
+			<option value="2">INSTL_CATEGORY_GETFROM_ITEM_2</option>
+		</field>
+
+		<field
+				name="articlesLang"
+				type="contentlanguage"
+				label="INSTL_LANGUAGE_ARTICLES_LABEL"
+				description="INSTL_LANGUAGE_ARTICLES_DESC"
+				id="articles_lang"
+				default="*"
+		>
+			<option value="*">JALL</option>
+		</field>
+
+		<field
+				name="filterText"
+				type="radio"
+				label="INSTL_FILTER_TEXT_LABEL"
+				description="INSTL_FILTER_TEXT_DESC"
+				default="0"
+				class="btn-group"
+				size="1"
+		>
+			<option value="1">JYES</option>
+			<option value="0">JNO</option>
+		</field>
+
+		<field
+				name="introFromFulltext"
+				type="radio"
+				label="INSTL_INTRO_FROM_FULLTEXT_LABEL"
+				description="INSTL_INTRO_FROM_FULLTEXT_DESC"
+				default="0"
+				class="btn-group"
+				size="1"
+		>
+			<option value="1">JYES</option>
+			<option value="0">JNO</option>
+		</field>
+
+		<field
+				name="imgPathSmiles"
+				type="text"
+				label="INSTL_IMG_PATH_SMILES_LABEL"
+				description="INSTL_IMG_PATH_SMILES_DESC"
+				class="span12"
+				required="true"
+		/>
+
+		<field type="spacer" name="spacer1" label="INSTL_IMGATTACH_SEPARATOR" />
+
+		<field
+				name="imgAttachCopy"
+				type="radio"
+				label="INSTL_IMGATTACH_COPY_LABEL"
+				description="INSTL_IMGATTACH_COPY_DESC"
+				default="0"
+				class="btn-group"
+				size="1"
+		>
+			<option value="0">JYES</option>
+			<option value="1">JNO</option>
+		</field>
+
+		<field
+				name="imgAttachFilesPerFolder"
+				type="number"
+				label="INSTL_IMGATTACH_FILES_PER_FOLDER_LABEL"
+				description="INSTL_IMGATTACH_FILES_PER_FOLDER_DESC"
+				default="200"
+				min="200"
+				max="10000"
+				step="100"
+				filter="integer"
+		/>
+
+		<field
+				name="imgThumbWidth"
+				type="text"
+				label="INSTL_IMGATTACH_WIDTH_LABEL"
+				description="INSTL_IMGATTACH_WIDTH_DESC"
+				default="200"
+				filter="integer"
+		/>
+	</fieldset>
+
+	<fieldset name="categories" addfieldpath="ucoz_converter/model/fields/">
+		<field
+				name="categoriesLang"
+				type="contentlanguage"
+				label="INSTL_LANGUAGE_CATEGORIES_LABEL"
+				description="INSTL_LANGUAGE_CATEGORIES_DESC"
+				id="categories_lang"
+				default="*"
+		>
+			<option value="*">JALL</option>
+		</field>
+
+		<field
+				name="categoriesUserId"
+				type="text"
+				label="INSTL_USER_ID_LABEL"
+				description="INSTL_USER_ID_DESC"
+				filter="integer"
+		/>
+
+		<field
+				name="categoriesAssoc"
+				type="repeatable"
+				icon="list"
+				id="categories_assoc"
+				label="INSTL_CATEGORIES_ADD_LABEL"
+				default='{"categories_ucoz":[],"categories_joomla":[]}'>
+			<fieldset hidden="true" name="categories_modal" repeat="true">
+				<field
+						name="categories_ucoz"
+						type="number"
+						label="INSTL_CATEGORIES_UCOZ_ID_LABEL"
+						min="0"
+						filter="integer"
+				/>
+				<field
+						name="categories_joomla"
+						type="category"
+						extension="com_content"
+						published="0,1"
+						label="INSTL_CATEGORIES_JOOMLA_ID_LABEL"
+						class="chzn-select-deselect"
+						default=""
+						filter="integer"
+				>
+					<option value=""></option>
+				</field>
+			</fieldset>
+		</field>
+	</fieldset>
+
+	<fieldset name="blog" addfieldpath="ucoz_converter/model/fields/">
+		<field
+				name="blogDefaultCategoryId"
+				type="category"
+				extension="com_content"
+				published="0,1"
+				label="INSTL_CATEGORY_BLOG_LABEL"
+				description="INSTL_CATEGORY_BLOG_DESC"
+				id="blog_default_category_id"
+				class="span12"
+				size="20"
+				default="2"
+		/>
+
+		<field
+				name="blogDefaultUserId"
+				type="text"
+				label="INSTL_USER_ID_LABEL"
+				description="INSTL_USER_ID_DESC"
+				filter="integer"
+		/>
+
+		<field
+				name="blogFeatured"
+				type="radio"
+				label="INSTL_FEATURED_LABEL"
+				description="INSTL_FEATURED_DESC"
+				id="blog-featured"
+				class="btn-group"
+				default="1"
+				filter="integer"
+		>
+			<option value="1">JYES</option>
+			<option value="0">JNO</option>
+		</field>
+
+		<field
+				name="blogState"
+				type="list"
+				label="JSTATUS"
+				description="JFIELD_PUBLISHED_DESC"
+				class="chzn-color-state"
+				filter="intval"
+				size="1"
+				default="1"
+		>
+			<option value="1">JPUBLISHED</option>
+			<option value="0">JUNPUBLISHED</option>
+			<option value="2">JARCHIVED</option>
+			<option value="-2">JTRASHED</option>
+		</field>
+
+		<field
+				name="blogIntroLimit"
+				type="number"
+				label="INSTL_INTROLIMIT_LABEL"
+				description="INSTL_INTROLIMIT_DESC"
+				default="400"
+		/>
+
+		<field
+				name="imgPathBlog"
+				type="text"
+				label="INSTL_IMGATTACH_PATH_LABEL"
+				description="INSTL_IMGATTACH_PATH_DESC"
+				class="span12"
+				required="true"
+		/>
+
+		<field
+				name="imgAttachPathBlogDst"
+				type="text"
+				label="INSTL_IMGATTACH_PATH_DEST_LABEL"
+				description="INSTL_IMGATTACH_PATH_DEST_DESC"
+				class="span12"
+				required="true"
+		/>
+	</fieldset>
+
+	<fieldset name="news" addfieldpath="ucoz_converter/model/fields/">
+		<field
+				name="newsDefaultCategoryId"
+				type="category"
+				extension="com_content"
+				published="0,1"
+				label="INSTL_CATEGORY_ARTICLES_LABEL"
+				description="INSTL_CATEGORY_ARTICLES_DESC"
+				id="news_default_category_id"
+				class="span12"
+				size="20"
+				default="2"
+		/>
+
+		<field
+				name="newsDefaultUserId"
+				type="text"
+				label="INSTL_USER_ID_LABEL"
+				description="INSTL_USER_ID_DESC"
+				filter="integer"
+		/>
+
+		<field
+				name="newsFeatured"
+				type="radio"
+				label="INSTL_FEATURED_LABEL"
+				description="INSTL_FEATURED_DESC"
+				id="news-featured"
+				class="btn-group"
+				default="1"
+				filter="integer"
+		>
+			<option value="1">JYES</option>
+			<option value="0">JNO</option>
+		</field>
+
+		<field
+				name="newsState"
+				type="list"
+				label="JSTATUS"
+				description="JFIELD_PUBLISHED_DESC"
+				class="chzn-color-state"
+				filter="intval"
+				size="1"
+				default="1"
+		>
+			<option value="1">JPUBLISHED</option>
+			<option value="0">JUNPUBLISHED</option>
+			<option value="2">JARCHIVED</option>
+			<option value="-2">JTRASHED</option>
+		</field>
+
+		<field
+				name="newsIntroLimit"
+				type="number"
+				label="INSTL_INTROLIMIT_LABEL"
+				description="INSTL_INTROLIMIT_DESC"
+				default="400"
+		/>
+
+		<field
+				name="imgPathNews"
+				type="text"
+				label="INSTL_IMGATTACH_PATH_LABEL"
+				description="INSTL_IMGATTACH_PATH_DESC"
+				class="span12"
+				required="true"
+		/>
+
+		<field
+				name="imgAttachPathNewsDst"
+				type="text"
+				label="INSTL_IMGATTACH_PATH_DEST_LABEL"
+				description="INSTL_IMGATTACH_PATH_DEST_DESC"
+				class="span12"
+				required="true"
+		/>
+	</fieldset>
+
+	<fieldset name="loads" addfieldpath="ucoz_converter/model/fields/">
+		<field
+				name="loadsDefaultCategoryId"
+				type="category"
+				extension="com_content"
+				published="0,1"
+				label="INSTL_CATEGORY_LOADS_LABEL"
+				description="INSTL_CATEGORY_LOADS_DESC"
+				id="loads_default_category_id"
+				class="span12"
+				size="20"
+				default="2"
+		/>
+
+		<field
+				name="loadsDefaultUserId"
+				type="text"
+				label="INSTL_USER_ID_LABEL"
+				description="INSTL_USER_ID_DESC"
+				filter="integer"
+		/>
+
+		<field
+				name="loadsFeatured"
+				type="radio"
+				label="INSTL_FEATURED_LABEL"
+				description="INSTL_FEATURED_DESC"
+				id="loads-featured"
+				class="btn-group"
+				default="1"
+				filter="integer"
+		>
+			<option value="1">JYES</option>
+			<option value="0">JNO</option>
+		</field>
+
+		<field
+				name="loadsState"
+				type="list"
+				label="JSTATUS"
+				description="JFIELD_PUBLISHED_DESC"
+				class="chzn-color-state"
+				filter="intval"
+				size="1"
+				default="1"
+		>
+			<option value="1">JPUBLISHED</option>
+			<option value="0">JUNPUBLISHED</option>
+			<option value="2">JARCHIVED</option>
+			<option value="-2">JTRASHED</option>
+		</field>
+
+		<field
+				name="loadsIntroLimit"
+				type="number"
+				label="INSTL_INTROLIMIT_LABEL"
+				description="INSTL_INTROLIMIT_DESC"
+				default="400"
+		/>
+
+		<field
+				name="imgPathLoads"
+				type="text"
+				label="INSTL_IMGATTACH_PATH_LABEL"
+				description="INSTL_IMGATTACH_PATH_DESC"
+				class="span12"
+				required="true"
+		/>
+
+		<field
+				name="imgAttachPathLoadsDst"
+				type="text"
+				label="INSTL_IMGATTACH_PATH_DEST_LABEL"
+				description="INSTL_IMGATTACH_PATH_DEST_DESC"
+				class="span12"
+				required="true"
+		/>
+	</fieldset>
+
+	<fieldset name="publ" addfieldpath="ucoz_converter/model/fields/">
+		<field
+				name="publDefaultCategoryId"
+				type="category"
+				extension="com_content"
+				published="0,1"
+				label="INSTL_CATEGORY_PUBL_LABEL"
+				description="INSTL_CATEGORY_PUBL_DESC"
+				id="publ_default_category_id"
+				class="span12"
+				size="20"
+				default="2"
+		/>
+
+		<field
+				name="publDefaultUserId"
+				type="text"
+				label="INSTL_USER_ID_LABEL"
+				description="INSTL_USER_ID_DESC"
+				filter="integer"
+		/>
+
+		<field
+				name="publFeatured"
+				type="radio"
+				label="INSTL_FEATURED_LABEL"
+				description="INSTL_FEATURED_DESC"
+				id="publ-featured"
+				class="btn-group"
+				default="1"
+				filter="integer"
+		>
+			<option value="1">JYES</option>
+			<option value="0">JNO</option>
+		</field>
+
+		<field
+				name="publState"
+				type="list"
+				label="JSTATUS"
+				description="JFIELD_PUBLISHED_DESC"
+				class="chzn-color-state"
+				filter="intval"
+				size="1"
+				default="1"
+		>
+			<option value="1">JPUBLISHED</option>
+			<option value="0">JUNPUBLISHED</option>
+			<option value="2">JARCHIVED</option>
+			<option value="-2">JTRASHED</option>
+		</field>
+
+		<field
+				name="publIntroLimit"
+				type="number"
+				label="INSTL_INTROLIMIT_LABEL"
+				description="INSTL_INTROLIMIT_DESC"
+				default="400"
+		/>
+
+		<field
+				name="imgPathPubl"
+				type="text"
+				label="INSTL_IMGATTACH_PATH_LABEL"
+				description="INSTL_IMGATTACH_PATH_DESC"
+				class="span12"
+				required="true"
+		/>
+
+		<field
+				name="imgAttachPathPublDst"
+				type="text"
+				label="INSTL_IMGATTACH_PATH_DEST_LABEL"
+				description="INSTL_IMGATTACH_PATH_DEST_DESC"
+				class="span12"
+				required="true"
+		/>
+	</fieldset>
+
+	<fieldset name="users">
+		<field
+				name="skipRegistered"
+				type="radio"
+				label="INSTL_SKIP_REG_LABEL"
+				description="INSTL_SKIP_REG_DESC"
+				id="skip_registered"
+				class="btn-group"
+				default="0"
+				filter="integer"
+		>
+			<option value="1">JYES</option>
+			<option value="0">JNO</option>
+		</field>
+
+		<field
+				name="requirePassReset"
+				type="radio"
+				label="INSTL_PASS_RESET_LABEL"
+				description="INSTL_PASS_RESET_DESC"
+				id="require_pass_reset"
+				class="btn-group"
+				default="1"
+				filter="integer"
+		>
+			<option value="1">JYES</option>
+			<option value="0">JNO</option>
+		</field>
+
+		<field
+				name="doExtraFields"
+				type="radio"
+				label="INSTL_EXTRA_FIELDS_LABEL"
+				description="INSTL_EXTRA_FIELDS_DESC"
+				id="extra_fields"
+				class="btn-group"
+				default="1"
+				filter="integer"
+		>
+			<option value="1">JYES</option>
+			<option value="0">JNO</option>
+		</field>
+
+		<field
+				name="userfields"
+				type="repeatable"
+				icon="list"
+				id="userfields"
+				label="INSTL_EXTRA_FIELDS_ADD_LABEL"
+				description="INSTL_EXTRA_FIELDS_ADD_DESC"
+				default='{"userfields_pos":[],"userfields_id":[]}'>
+			<fieldset hidden="true" name="userfields_modal" repeat="true" addfieldpath="ucoz_converter/model/fields/">
+				<field
+						name="userfields_pos"
+						type="number"
+						label="INSTL_EXTRA_FIELDS_POS_LABEL"
+						size="2"
+						min="0"
+						max="30"
+						filter="integer"
+				/>
+				<field
+						name="userfields_id"
+						type="installation.fields"
+						label="INSTL_EXTRA_FIELDS_JFIELD_LABEL"
+						default=""
+						filter="integer"
+						context="com_users.user"
+				>
+					<option value=""></option>
+				</field>
+			</fieldset>
+		</field>
+
+		<field
+				name="defaultUserGroupId"
+				type="usergrouplist"
+				label="INSTL_USERGROUP_ID_LABEL"
+				description="INSTL_USERGROUP_ID_DESC"
+				filter="integer"
+				default=""
+		>
+			<option value="">JDEFAULT</option>
+		</field>
+
+		<field
+				name="usergroups"
+				type="repeatable"
+				icon="list"
+				id="usergroups"
+				label="INSTL_USERGROUPS_ADD_LABEL"
+				default='{"usergroups_ucoz":[],"usergroups_joomla":[]}'>
+			<fieldset hidden="true" name="usergroups_modal" repeat="true">
+				<field
+						name="usergroups_ucoz"
+						type="number"
+						label="INSTL_USERGROUPS_UCOZ_ID_LABEL"
+						min="0"
+						filter="integer"
+				/>
+				<field
+						name="usergroups_joomla"
+						type="usergrouplist"
+						label="INSTL_USERGROUPS_JOOMLA_LABEL"
+						default=""
+						filter="integer"
+				>
+					<option value=""></option>
+				</field>
+			</fieldset>
+		</field>
+	</fieldset>
+</form>
