@@ -37,4 +37,13 @@ class ConverterConfig {
 	public $imgAttachCopy = '1';
 	public $imgAttachFilesPerFolder = '4000';
 	public $imgThumbWidth = '200';
+	public $imgPathSmiles = '/images/smiles/';
+	public $imgPathBlog = 'images/blog/';
+	public $imgPathNews = 'images/news/';
+	public $imgPathPubl = 'images/posts/';
+	public $imgPathLoads = 'images/loads/';
+	public $imgAttachPathBlogDst = 'D:/WWW/htdocs/1/images/blog/';
+	public $imgAttachPathNewsDst = 'D:/WWW/htdocs/1/images/news/';
+	public $imgAttachPathLoadsDst = 'D:/WWW/htdocs/1/images/loads/';
+	public $imgAttachPathPublDst = 'D:/WWW/htdocs/1/images/publ/';
 }
