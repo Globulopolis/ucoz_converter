@@ -9,12 +9,6 @@
 
 defined('_JEXEC') or die;
 ?>
-<div class="btn-toolbar">
-	<div class="btn-group pull-right">
-		<a href="javascript:void();" class="btn btn-primary" onclick="Install.submitform();"
-			title="<?php echo JText::_('JSAVE'); ?>"><span class="icon-hdd icon-white"></span> <?php echo JText::_('JSAVE'); ?></a>
-	</div>
-</div>
 <form action="<?php echo JUri::base(); ?>index.php" method="post" id="languageForm" class="form-horizontal">
 	<div class="control-group">
 		<label for="jform_language" class="control-label"><?php echo JText::_('INSTL_SELECT_LANGUAGE_TITLE'); ?></label>
@@ -26,6 +20,11 @@ defined('_JEXEC') or die;
 	<?php echo JHtml::_('form.token'); ?>
 </form>
 <form action="<?php echo JUri::base(); ?>index.php" method="post" id="adminForm" class="form-validate form-horizontal" autocomplete="off">
+	<div class="btn-toolbar">
+		<div class="btn-group pull-right">
+			<button type="submit" class="btn btn-primary"><span class="icon-hdd icon-white"></span> <?php echo JText::_('JSAVE'); ?></button>
+		</div>
+	</div>
 	<h3><?php echo JText::_('INSTL_SITE'); ?></h3>
 	<hr class="hr-condensed" />
 
@@ -140,8 +139,7 @@ defined('_JEXEC') or die;
 	<div class="row-fluid">
 		<div class="btn-toolbar">
 			<div class="btn-group pull-right">
-				<a href="javascript:void();" class="btn btn-primary" onclick="Install.submitform();"
-					title="<?php echo JText::_('JSAVE'); ?>"><span class="icon-hdd icon-white"></span> <?php echo JText::_('JSAVE'); ?></a>
+				<button type="submit" class="btn btn-primary"><span class="icon-hdd icon-white"></span> <?php echo JText::_('JSAVE'); ?></button>
 			</div>
 		</div>
 	</div>

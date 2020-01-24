@@ -8,6 +8,7 @@
  */
 
 defined('JPATH_BASE') or die;
+define('CBLIB', true);
 
 JFormHelper::loadFieldClass('list');
 
@@ -36,15 +37,72 @@ class InstallationFormFieldFields extends JFormFieldList
 	protected function getOptions()
 	{
 		$db = JFactory::getDbo();
-		$query = $db->getQuery(true);
+		$cbOptions = array();
+		$options    = array();
 
-		$query->select('DISTINCT a.id AS value, a.title AS text');
-		$query->from('#__fields AS a');
-		$query->join('LEFT', '#__fields_groups AS g ON g.id = a.group_id');
-		$query->where("a.context = '" . $db->escape($this->element['context']) . "'");
-		$query->where('a.state IN (0, 1)');
-		$query->where('(a.group_id = 0 OR g.state IN (0, 1))');
-		$query->order('a.ordering ASC');
+		$query = $db->getQuery(true)
+			->select('COUNT(extension_id)')
+			->from('#__extensions')
+			->where("element = 'com_comprofiler'");
+		$db->setQuery($query);
+
+		$isComprofiler = (int) $db->loadResult();
+
+		if ($isComprofiler > 0)
+		{
+			$query = $db->getQuery(true)
+				->select('DISTINCT fieldid AS value, title AS text')
+				->from($db->quoteName('#__comprofiler_fields'))
+				->where($db->quoteName('table') . " = '#__comprofiler'")
+				->order('ordering ASC');
+			$db->setQuery($query);
+
+			try
+			{
+				$_cbOptions = $db->loadAssocList();
+
+				if (!empty($_cbOptions))
+				{
+					$temp = JFactory::getSession()->get('setup.options', array());
+
+					if (!empty($temp))
+					{
+						$lang = $temp['language'];
+					}
+					else
+					{
+						$lang = JFactory::getLanguage()->getTag();
+					}
+
+					// Load Community Builder language file and translate field name.
+					require_once JPATH_LIBRARIES . '/CBLib/CBLib/Language/CBTxt.php';
+					$cbLang = new \CBLib\Language\CBTxt;
+					$cbLang::import(JPATH_ROOT . '/components/com_comprofiler/plugin/language', $lang, 'language.php');
+
+					foreach ($_cbOptions as $cbOpts)
+					{
+						$cbOptions[] = array(
+							'value' => $cbOpts['value'],
+							'text'  => 'CB: ' . $cbLang::T($cbOpts['text'])
+						);
+					}
+				}
+			}
+			catch (RuntimeException $e)
+			{
+				echo $e->getMessage();
+			}
+
+		}
+
+		$query = $db->getQuery(true)
+			->select('DISTINCT a.id AS value, a.title AS text')
+			->from($db->quoteName('#__fields', 'a'))
+			->join('LEFT', '#__fields_groups AS g ON g.id = a.group_id')
+			->where("a.context = '" . $db->escape($this->element['context']) . "'")
+			->where('a.state IN (0, 1)')
+			->where('(a.group_id = 0 OR g.state IN (0, 1))')
+			->order('a.ordering ASC');
 		$db->setQuery($query);
 
 		try
@@ -53,11 +111,11 @@ class InstallationFormFieldFields extends JFormFieldList
 		}
 		catch (RuntimeException $e)
 		{
-			$options = array();
+			echo $e->getMessage();
 		}
 
 		// Merge any additional options in the XML definition.
-		return array_merge(parent::getOptions(), $options);
+		return array_merge(parent::getOptions(), $options, $cbOptions);
 	}
 
 	/**

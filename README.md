@@ -10,6 +10,7 @@ Goals:
 - [ ] Converter for loads
 - [ ] Converter for news
 - [ ] Converter for publications
+- [x] Web configurator
 
 **How to install**
 

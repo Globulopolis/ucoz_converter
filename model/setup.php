@@ -116,54 +116,6 @@ class InstallationModelSetup extends JModelBase
 	}
 
 	/**
-	 * Method to check the form data.
-	 *
-	 * @param   string  $page  The view being checked.
-	 *
-	 * @return  array  Validated form data.
-	 *
-	 * @since   3.1
-	 * @throws  Exception
-	 */
-	public function checkForm($page = 'site')
-	{
-		$app = JFactory::getApplication();
-
-		// Get the posted values from the request and validate them.
-		$data   = $app->input->post->get('jform', array(), 'array');
-		$return = $this->validate($data, $page);
-
-		// Attempt to save the data before validation.
-		$form = $this->getForm();
-		$data = $form->filter($data);
-
-		$this->storeOptions($data);
-
-		// Check for validation errors.
-		if ($return === false)
-		{
-			// Redirect back to the previous page.
-			$response = new stdClass;
-			$response->view = $page;
-			$app->sendJsonResponse($response);
-		}
-
-		try
-		{
-			$this->writeConfigFile($data);
-		}
-		catch (Exception $e)
-		{
-			$app->enqueueMessage($e->getMessage());
-		}
-
-		$app->enqueueMessage(JText::_('INSTL_CONFIG_SAVE_SUCCESS'));
-
-		// Store the options in the session.
-		return $this->storeOptions($return);
-	}
-
-	/**
 	 * Method to write the configuration to a file.
 	 *
 	 * @param   array  $config  A Registry object containing all global config data.
@@ -173,7 +125,7 @@ class InstallationModelSetup extends JModelBase
 	 * @throws  Exception|RuntimeException
 	 * @since   0.1
 	 */
-	private function writeConfigFile($config)
+	public function writeConfigFile($config)
 	{
 		jimport('joomla.filesystem.path');
 		jimport('joomla.filesystem.file');

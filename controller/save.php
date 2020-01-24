@@ -31,16 +31,32 @@ class InstallationControllerSave extends JControllerBase
 		$app = $this->getApplication();
 
 		// Check for request forgeries.
-		JSession::checkToken() or $app->sendJsonResponse(new Exception(JText::_('JINVALID_TOKEN_NOTICE'), 403));
+		JSession::checkToken() or jexit(JText::_('JINVALID_TOKEN_NOTICE'));
 
 		// Get the setup model.
 		$model = new InstallationModelSetup;
 
 		// Check the form
-		$model->checkForm('site');
+		$model  = new InstallationModelSetup;
+		$data   = $app->input->post->get('jform', array(), 'array');
+		$form   = $model->getForm();
 
-		$response = new stdClass;
-		$response->view = 'site';
-		$app->sendJsonResponse($response);
+		if (!$form)
+		{
+			$app->enqueueMessage(JText::_('JGLOBAL_VALIDATION_FORM_FAILED'), 'error');
+
+			return;
+		}
+
+		$validData = $model->validate($data, 'site');
+
+		// Check for validation errors.
+		if ($validData !== false)
+		{
+			$model->writeConfigFile($data);
+			$app->enqueueMessage(JText::_('INSTL_CONFIG_SAVE_SUCCESS'));
+		}
+
+		$app->redirect('index.php');
 	}
 }

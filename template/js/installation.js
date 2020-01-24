@@ -23,63 +23,6 @@ var Installation = function (_container, _base) {
 	};
 
 	/**
-	 * Method to submit a form from the installer via AJAX
-	 *
-	 * @return {Boolean}
-	 */
-	var submitform = function () {
-		var $form = $('#adminForm');
-
-		if (busy) {
-			alert(Joomla.JText._('INSTL_PROCESS_BUSY', 'Process is in progress. Please wait...'));
-			return false;
-		}
-
-		Joomla.loadingLayer('show');
-		busy = true;
-		Joomla.removeMessages();
-		var data = 'format: json&' + $form.serialize();
-
-		$.ajax({
-			type : 'POST',
-			url : baseUrl,
-			data : data,
-			dataType : 'json'
-		}).done(function (r) {
-			Joomla.replaceTokens(r.token);
-
-			if (r.messages) {
-				Joomla.renderMessages(r.messages);
-			}
-
-			var lang = $('html').attr('lang');
-
-			if (r.lang !== null && lang.toLowerCase() === r.lang.toLowerCase()) {
-				Install.goToPage(r.data.view, true);
-			}
-			else
-			{
-				window.location = baseUrl + '?view=' + r.data.view;
-			}
-		}).fail(function (xhr) {
-			Joomla.loadingLayer("hide");
-			busy = false;
-
-			try {
-				var r = $.parseJSON(xhr.responseText);
-				Joomla.replaceTokens(r.token);
-				alert(r.message);
-			}
-			catch (e)
-			{
-				alert(e);
-			}
-		});
-
-		return false;
-	};
-
-	/**
 	 * Method to set the language for the installation UI via AJAX
 	 *
 	 * @return {Boolean}
@@ -205,7 +148,6 @@ var Installation = function (_container, _base) {
 	initialize(_container, _base);
 
 	return {
-		submitform : submitform,
 		setlanguage : setlanguage,
 		goToPage : goToPage,
 		toggle : toggle
