@@ -498,7 +498,7 @@
 			<option value="0">JNO</option>
 		</field>
 
-		<field name="is_comprofiler"
+		<field name="isComprofiler"
 			   type="checkbox"
 			   label="INSTL_EXTRA_FIELDS_COMPROFILER_LABEL"
 			   description="INSTL_EXTRA_FIELDS_COMPROFILER_DESC"

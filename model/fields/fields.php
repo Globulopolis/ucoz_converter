@@ -40,6 +40,7 @@ class InstallationFormFieldFields extends JFormFieldList
 		$cbOptions = array();
 		$options    = array();
 
+		// Check if Community Builder is installed.
 		$query = $db->getQuery(true)
 			->select('COUNT(extension_id)')
 			->from('#__extensions')
@@ -50,6 +51,7 @@ class InstallationFormFieldFields extends JFormFieldList
 
 		if ($isComprofiler > 0)
 		{
+			// Select all fields for Community Builder only(for #__comprofiler table).
 			$query = $db->getQuery(true)
 				->select('DISTINCT fieldid AS value, title AS text')
 				->from($db->quoteName('#__comprofiler_fields'))

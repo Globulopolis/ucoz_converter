@@ -67,7 +67,6 @@ Class ConverterCategories extends JApplicationCli
 	 */
 	public function doExecute()
 	{
-		$execTime  = -microtime(true);
 		$outputLog = "======= " . date('Y-m-d H:i:s', time()) . " =======\n";
 
 		JLoader::register('CategoriesHelper', JPATH_ADMINISTRATOR . '/components/com_categories/helpers/categories.php');
@@ -190,14 +189,9 @@ Class ConverterCategories extends JApplicationCli
 		// E.g.: array('news' => array('joomla_id' => 'ucoz_id', ...), ...)
 		ConverterHelper::saveAssocData(__DIR__ . '/imports/categories_import.json', $ids);
 
-		$execTime += microtime(true);
-		$execTime = sprintf('%f', $execTime);
-		list($sec, $usec) = explode('.', $execTime);
-
 		$succMsg = "\n" . 'Total categories: ' . $totalRows . '.' .
 			  "\n" . 'Categories imported: ' . $totalImported . '.' .
-			  "\n" . 'Errors found: ' . $totalErrors .
-			  "\n" . 'Took: ' . number_format($sec / 60, 2) . 'min';
+			  "\n" . 'Errors found: ' . $totalErrors . "\n";
 		$outputLog .= $succMsg;
 
 		file_put_contents(__DIR__ . '/imports/categories_import.log', $outputLog . "\n\n", FILE_APPEND);

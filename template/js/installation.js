@@ -60,14 +60,7 @@ var Installation = function (_container, _base) {
 				alert('Could not load or parse language xml file! Check InstallationResponseJson for reply.');
 			}
 
-			var lang = $('html').attr('lang');
-			if (lang.toLowerCase() === response.lang.toLowerCase()) {
-				Install.goToPage(response.data.view, true);
-			}
-			else
-			{
-				window.location = baseUrl + '?view=' + response.data.view;
-			}
+			window.location = baseUrl + '?view=' + response.data.view;
 		}).fail(function (xhr, status, error) {
 			Joomla.loadingLayer("hide");
 			busy = false;
@@ -82,40 +75,6 @@ var Installation = function (_container, _base) {
 				// Response isn't JSON string, so alert as text.
 				alert(error + ': ' + xhr.responseText);
 			}
-		});
-
-		return false;
-	};
-
-	/**
-	 * Method to request a different page via AJAX
-	 *
-	 * @param  page        The name of the view to request
-	 * @param  fromSubmit  Unknown use
-	 *
-	 * @return {Boolean}
-	 */
-	var goToPage = function (page, fromSubmit) {
-		if (!fromSubmit) {
-			Joomla.removeMessages();
-			Joomla.loadingLayer("show");
-		}
-
-		$.ajax({
-			type : "GET",
-			url : baseUrl + '?tmpl=body&view=' + page,
-			dataType : 'html'
-		}).done(function (result) {
-			$('#' + container).html(result);
-			view = page;
-
-			// Attach JS behaviors to the newly loaded HTML
-			pageInit();
-
-			Joomla.loadingLayer("hide");
-			busy = false;
-
-			initElements();
 		});
 
 		return false;
@@ -149,7 +108,6 @@ var Installation = function (_container, _base) {
 
 	return {
 		setlanguage : setlanguage,
-		goToPage : goToPage,
 		toggle : toggle
 	}
 };
