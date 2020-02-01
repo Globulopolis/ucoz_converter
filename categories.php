@@ -55,6 +55,7 @@ catch (Exception $e)
  * Class for categories.
  *
  * @since  0.1
+ * @noinspection PhpUnused
  */
 Class ConverterCategories extends JApplicationCli
 {

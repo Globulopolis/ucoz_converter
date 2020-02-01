@@ -39,11 +39,11 @@ class ConverterConfig {
 	public $publIntroLimit = '400';
 	public $imgPathPubl = 'images/posts/';
 	public $imgAttachPathPublDst = 'D:/WWW/htdocs/1/images/publ/';
-	public $skipRegistered = '1';
+	public $skipRegistered = '0';
 	public $requirePassReset = '1';
-	public $doExtraFields = '0';
-	public $is_comprofiler = '1';
-	public $userfields = '{"userfields_pos":["3","22","5","6","8","13"],"userfields_id":["1","2","3","4","5","6"]}';
+	public $doExtraFields = '1';
+	public $isComprofiler = '1';
+	public $userfields = '{"userfields_pos":["3","22","5","6","8","13"],"userfields_id":["cb:avatar","2","3","4","5","6"]}';
 	public $defaultUserGroupId = '';
 	public $usergroups = '{"usergroups_ucoz":["1","2","3","4","5","6","7","8","9","10","11","251","255"],"usergroups_joomla":["1","2","6","8","7","3","5","5","6","2","2","2","2"]}';
 }

@@ -58,6 +58,7 @@ catch (Exception $e)
  * Class for users.
  *
  * @since  0.1
+ * @noinspection PhpUnused
  */
 Class ConverterUgen extends JApplicationCli
 {

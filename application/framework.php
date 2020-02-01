@@ -21,13 +21,16 @@ const JDEBUG = false;
  */
 
 // Import the Joomla Platform.
+/** @noinspection PhpIncludeInspection */
 require_once JPATH_LIBRARIES . '/import.legacy.php';
 
 // Bootstrap the CMS libraries.
+/** @noinspection PhpIncludeInspection */
 require_once JPATH_LIBRARIES . '/cms.php';
 
 // Pre-Load configuration. Don't remove the Output Buffering due to BOM issues, see JCode 26026
 ob_start();
+/** @noinspection PhpIncludeInspection */
 require_once JPATH_INSTALLATION . '/config.php';
 ob_end_clean();
 

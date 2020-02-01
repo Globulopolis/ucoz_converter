@@ -519,19 +519,4 @@ final class InstallationApplicationWeb extends JApplicationCms
 		// Close the application.
 		$this->close();
 	}
-
-	/**
-	 * Set configuration values.
-	 *
-	 * @param   array   $vars       Array of configuration values
-	 * @param   string  $namespace  The namespace
-	 *
-	 * @return  void
-	 *
-	 * @since   3.1
-	 */
-	public function setCfg(array $vars = array(), $namespace = 'config')
-	{
-		$this->config->loadArray($vars, $namespace);
-	}
 }

@@ -15,7 +15,7 @@ JFormHelper::loadFieldClass('list');
 /**
  * List of fields.
  *
- * @since  1.6
+ * @since  0.1
  */
 class InstallationFormFieldFields extends JFormFieldList
 {
@@ -23,7 +23,7 @@ class InstallationFormFieldFields extends JFormFieldList
 	 * The form field type.
 	 *
 	 * @var    string
-	 * @since  1.6
+	 * @since  0.1
 	 */
 	protected $type = 'Fields';
 
@@ -32,13 +32,13 @@ class InstallationFormFieldFields extends JFormFieldList
 	 *
 	 * @return  array  The field option objects.
 	 *
-	 * @since   1.6
+	 * @since   0.1
 	 */
 	protected function getOptions()
 	{
-		$db = JFactory::getDbo();
+		$db        = JFactory::getDbo();
 		$cbOptions = array();
-		$options    = array();
+		$options   = array();
 
 		// Check if Community Builder is installed.
 		$query = $db->getQuery(true)
@@ -53,9 +53,10 @@ class InstallationFormFieldFields extends JFormFieldList
 		{
 			// Select all fields for Community Builder only(for #__comprofiler table).
 			$query = $db->getQuery(true)
-				->select('DISTINCT fieldid AS value, title AS text')
+				->select('DISTINCT tablecolumns AS value, title AS text')
 				->from($db->quoteName('#__comprofiler_fields'))
 				->where($db->quoteName('table') . " = '#__comprofiler'")
+				->where($db->quoteName('tablecolumns') . " != ''")
 				->order('ordering ASC');
 			$db->setQuery($query);
 
@@ -83,8 +84,10 @@ class InstallationFormFieldFields extends JFormFieldList
 
 					foreach ($_cbOptions as $cbOpts)
 					{
+						$value = explode(',', $cbOpts['value']);
 						$cbOptions[] = array(
-							'value' => $cbOpts['value'],
+							// Add cb: to field name so we can know that this is CB field not the Joomla field ID.
+							'value' => 'cb:' . $value[0],
 							'text'  => 'CB: ' . $cbLang::T($cbOpts['text'])
 						);
 					}
@@ -126,13 +129,13 @@ class InstallationFormFieldFields extends JFormFieldList
 	 *
 	 * @return  string  The field input markup.
 	 *
-	 * @since   3.6
+	 * @since   0.1
 	 */
 	protected function getInput()
 	{
-		$html = array();
+		$html  = array();
 		$class = array();
-		$attr = '';
+		$attr  = '';
 
 		// Initialize some field attributes.
 		$class[] = !empty($this->class) ? $this->class : '';
@@ -198,9 +201,9 @@ class InstallationFormFieldFields extends JFormFieldList
 			if (count($options) === 0)
 			{
 				// All fields have been deleted, so we need a new field.
-				$options[0]            = new stdClass;
-				$options[0]->value     = 0;
-				$options[0]->text      = 'New ID';
+				$options[0]        = new stdClass;
+				$options[0]->value = 0;
+				$options[0]->text  = 'New ID';
 			}
 
 			$html[] = JHtml::_('select.genericlist', $options, $this->name, trim($attr), 'value', 'text', $this->value, $this->id);

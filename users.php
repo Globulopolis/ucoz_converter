@@ -60,6 +60,7 @@ catch (Exception $e)
  * Class for users.
  *
  * @since  0.1
+ * @noinspection PhpUnused
  */
 Class ConverterUsers extends JApplicationCli
 {
@@ -76,7 +77,7 @@ Class ConverterUsers extends JApplicationCli
 	protected $fields = null;
 
 	/**
-	 * @var    object   Database object.
+	 * @var    JDatabaseDriver|JDatabaseQuery   Database object.
 	 * @since  0.1
 	 */
 	protected $db;
@@ -90,7 +91,6 @@ Class ConverterUsers extends JApplicationCli
 	 */
 	public function doExecute()
 	{
-		$execTime = -microtime(true);
 		$this->db = Factory::getDbo();
 		$lang     = Factory::getLanguage();
 		$lang->load('lib_joomla');
@@ -234,14 +234,9 @@ Class ConverterUsers extends JApplicationCli
 		// E.g.: array('joomla_id' => 'ucoz_username', ...)
 		ConverterHelper::saveAssocData(__DIR__ . '/imports/users_import.json', $ids);
 
-		$execTime += microtime(true);
-		$execTime = sprintf('%f', $execTime);
-		list($sec, $usec) = explode('.', $execTime);
-
 		$succMsg = "\n" . 'Total users: ' . $totalUsers . '.' .
 			  "\n" . 'Users ' . strtolower($regTxt) . ': ' . $totalUsersImported . '.' .
-			  "\n" . 'Errors found: ' . $totalUsersError .
-			  "\n" . 'Took: ' . number_format($sec / 60, 2) . 'min';
+			  "\n" . 'Errors found: ' . $totalUsersError . "\n";
 		$outputLog .= $succMsg;
 
 		file_put_contents(__DIR__ . '/imports/users_import.log', $outputLog . "\n\n", FILE_APPEND);
@@ -264,6 +259,11 @@ Class ConverterUsers extends JApplicationCli
 		if ($this->config->get('doExtraFields') != 1)
 		{
 			return true;
+		}
+
+		if ($this->config->get('isComprofiler') == 1)
+		{
+			return $this->updateCBField($data, $uid);
 		}
 
 		if (empty($this->fields))
@@ -295,11 +295,11 @@ Class ConverterUsers extends JApplicationCli
 			}
 			else
 			{
-				foreach ($this->fields as $key => $fieldId)
+				foreach ($this->fields as $ucozPos => $fieldId)
 				{
 					$query = $this->db->getQuery(true)
 						->update($this->db->quoteName('#__fields_values'))
-						->set($this->db->quoteName('value') . " = '" . $this->db->escape($data[$key]) . "'")
+						->set($this->db->quoteName('value') . " = '" . $this->db->escape($data[$ucozPos]) . "'")
 						->where($this->db->quoteName('field_id') . ' = ' . (int) $fieldId)
 						->where($this->db->quoteName('item_id') . ' = ' . (int) $uid);
 
@@ -312,6 +312,8 @@ Class ConverterUsers extends JApplicationCli
 					catch (RuntimeException $e)
 					{
 						echo __LINE__ . " - " . $e->getMessage() . "\n";
+
+						return false;
 					}
 				}
 			}
@@ -327,7 +329,7 @@ Class ConverterUsers extends JApplicationCli
 	 * @param   mixed    $data     Field data.
 	 * @param   integer  $uid      User ID.
 	 *
-	 * @return  void
+	 * @return  boolean
 	 * @since   0.1
 	 */
 	protected function insertField($fields, &$data, $uid)
@@ -336,9 +338,9 @@ Class ConverterUsers extends JApplicationCli
 			->insert($this->db->quoteName('#__fields_values'))
 			->columns($this->db->quoteName(array('field_id', 'item_id', 'value')));
 
-		foreach ($fields as $key => $fieldId)
+		foreach ($fields as $ucozPos => $fieldId)
 		{
-			$value = is_array($data) ? $data[$key] : $data;
+			$value = is_array($data) ? $data[$ucozPos] : $data;
 			$query->values("'" . (int) $fieldId . "', '" . $uid . "', '" . $this->db->escape($value) . "'");
 		}
 
@@ -351,7 +353,53 @@ Class ConverterUsers extends JApplicationCli
 		catch (RuntimeException $e)
 		{
 			echo __LINE__ . " - " . $e->getMessage() . "\n";
+
+			return false;
 		}
+
+		return true;
+	}
+
+	/**
+	 * Update field information in Community Buider fields table.
+	 *
+	 * @param   mixed    $data     Field data.
+	 * @param   integer  $uid      User ID.
+	 *
+	 * @return  boolean
+	 * @since   0.1
+	 */
+	protected function updateCBField(&$data, $uid)
+	{
+		$query = $this->db->getQuery(true)
+			->update($this->db->quoteName('#__comprofiler'));
+
+		foreach ($this->fields as $ucozPos => $field)
+		{
+			if (strpos($field, 'cb:') !== false)
+			{
+				$value  = is_array($data) ? $data[$ucozPos] : $data;
+				$column = $this->db->escape(substr($field, 3));
+				$query->set($this->db->quoteName($column) . " = '" . $this->db->escape($value) . "'");
+			}
+		}
+
+		$query->where($this->db->quoteName('user_id') . ' = ' . (int) $uid);
+
+		$this->db->setQuery($query);
+
+		try
+		{
+			$this->db->execute();
+		}
+		catch (RuntimeException $e)
+		{
+			echo __LINE__ . " - " . $e->getMessage() . "\n";
+
+			return false;
+		}
+
+		return true;
 	}
 }
 
