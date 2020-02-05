@@ -218,7 +218,7 @@ function initElements()
 		});
 
 		// Attach close button to repeatable modal
-		$('#jform_categories_assoc_table, #jform_userfields_table, #jform_usergroups_table').find('thead th:last div:last').after('<button type="button" class="close novalidate" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>');
+		$('.inst-subform').find('thead th:last div:last').after('<button type="button" class="close novalidate" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>');
 	})(jQuery);
 }
 

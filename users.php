@@ -9,7 +9,7 @@
 
 /**
  * This is a script to convert users from Ucoz to Joomla which should be called from the command-line, not the web.
- * Example: /usr/bin/php /path/to/site/cli/converter/users.php
+ * Example: /path/to/php /path/to/site/ucoz_converter/users.php
  *
  * NOTE! All imported users should restore their passwords, because Ucoz and Joomla hashes have different generation algorithms.
  */

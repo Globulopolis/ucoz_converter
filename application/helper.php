@@ -237,7 +237,7 @@ class ConverterHelper
 			if (!empty($_categories))
 			{
 				$_categories = json_decode($_categories);
-				$categories  = array_combine($_categories->categories_ucoz, $_categories->categories_joomla);
+				$categories  = array_combine($_categories->categoriesUcoz, $_categories->categoriesJoomla);
 			}
 		}
 		elseif ((int) $config->get('fromCategoryImports') === 1)
@@ -311,6 +311,7 @@ class ConverterHelper
 			$msg = JText::_('COM_CONTENT_SAVE_WARNING') . "\n";
 		}
 
+		/** @noinspection  PhpUnusedLocalVariableInspection */
 		list($title, $alias) = self::generateNewTitle($data['catid'], $data['alias'], $data['title']);
 		$data['alias'] = $alias;
 
@@ -408,6 +409,8 @@ class ConverterHelper
 	 * Replace site URL. Require to replace non-https URL in images or links.
 	 * Replace more URLs. Sometimes images or other content can be placed at root directory. So if we want to move all
 	 * these folders to, e.g. images we need to replace URLs to new location.
+	 *
+	 * TODO Change method to support list of URLs.
 	 *
 	 * @param   string    $text     Content where to replace.
 	 * @param   Registry  $config   Converter config object.

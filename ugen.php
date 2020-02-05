@@ -9,7 +9,7 @@
 
 /**
  * This is a script to convert users parameters from Ucoz to Joomla which should be called from the command-line, not the web.
- * Example: /usr/bin/php /path/to/site/cli/converter/ugen.php
+ * Example: /path/to/php /path/to/site/ucoz_converter/ugen.php
  *
  * NOTE! Run this file only after users.php.
  */

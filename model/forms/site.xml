@@ -20,6 +20,13 @@
 			   required="true"
 		/>
 
+		<field name="siteURL"
+			   type="text"
+			   label="INSTL_SITE_URL_LABEL"
+			   description="INSTL_SITE_URL_DESC"
+			   class="span12"
+		/>
+
 		<field name="fromCategoryImports"
 			   type="list"
 			   label="INSTL_CATEGORY_GETFROM_LABEL"
@@ -65,6 +72,40 @@
 		>
 			<option value="1">JYES</option>
 			<option value="0">JNO</option>
+		</field>
+
+		<field name="updateAlias"
+			   type="radio"
+			   label="INSTL_UPDATE_ALIAS_LABEL"
+			   description="INSTL_UPDATE_ALIAS_DESC"
+			   default="1"
+			   class="btn-group"
+			   size="1"
+		>
+			<option value="1">JYES</option>
+			<option value="0">JNO</option>
+		</field>
+
+		<field name="replaceUrls"
+			   type="repeatable"
+			   icon="list"
+			   class="inst-subform"
+			   id="replaceurls"
+			   label="INSTL_REPLACE_URLS_LABEL"
+			   description="INSTL_REPLACE_URLS_DESC"
+			   default='{"oldUrl":[],"newUrl":[]}'>
+			<fieldset hidden="true" name="replaceurls_modal" repeat="true">
+				<field name="oldUrl"
+					   type="text"
+					   label="INSTL_REPLACE_URLS_COL1_LABEL"
+					   class="span6"
+				/>
+				<field name="newUrl"
+					   type="text"
+					   label="INSTL_REPLACE_URLS_COL2_LABEL"
+					   class="span6"
+				/>
+			</fieldset>
 		</field>
 
 		<field name="imgPathSmiles"
@@ -133,17 +174,18 @@
 		<field name="categoriesAssoc"
 			   type="repeatable"
 			   icon="list"
+			   class="inst-subform"
 			   id="categories_assoc"
 			   label="INSTL_CATEGORIES_ADD_LABEL"
-			   default='{"categories_ucoz":[],"categories_joomla":[]}'>
+			   default='{"categoriesUcoz":[],"categoriesJoomla":[]}'>
 			<fieldset hidden="true" name="categories_modal" repeat="true">
-				<field name="categories_ucoz"
+				<field name="categoriesUcoz"
 					   type="number"
 					   label="INSTL_CATEGORIES_UCOZ_ID_LABEL"
 					   min="0"
 					   filter="integer"
 				/>
-				<field name="categories_joomla"
+				<field name="categoriesJoomla"
 					   type="category"
 					   extension="com_content"
 					   published="0,1"
@@ -508,6 +550,7 @@
 		<field name="userfields"
 			   type="repeatable"
 			   icon="list"
+			   class="inst-subform"
 			   id="userfields"
 			   label="INSTL_EXTRA_FIELDS_ADD_LABEL"
 			   description="INSTL_EXTRA_FIELDS_ADD_DESC"
@@ -546,6 +589,7 @@
 		<field name="usergroups"
 			   type="repeatable"
 			   icon="list"
+			   class="inst-subform"
 			   id="usergroups"
 			   label="INSTL_USERGROUPS_ADD_LABEL"
 			   default='{"usergroups_ucoz":[],"usergroups_joomla":[]}'>

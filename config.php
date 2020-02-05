@@ -1,17 +1,20 @@
 <?php
 class ConverterConfig {
 	public $backupPath = 'D:/_bk_mztfR9hPLH/';
+	public $siteURL = '';
 	public $fromCategoryImports = '1';
 	public $articlesLang = '*';
 	public $filterText = '0';
 	public $introFromFulltext = '1';
+	public $updateAlias = '1';
+	public $replaceUrls = '{"oldUrl":["/banners"],"newUrl":["images/banners"]}';
 	public $imgPathSmiles = '/images/smiles/';
 	public $imgAttachCopy = '1';
 	public $imgAttachFilesPerFolder = '4000';
 	public $imgThumbWidth = '200';
 	public $categoriesLang = '*';
 	public $categoriesUserId = '972';
-	public $categoriesAssoc = '{"categories_ucoz":["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","20","21","22","23","25","26"],"categories_joomla":["12","9","2","8","17","11","19","16","10","22","14","19","20","21","25","15","26","10","13","28","23","24","18","27"]}';
+	public $categoriesAssoc = '{"categoriesUcoz":["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","20","21","22","23","25","26"],"categoriesJoomla":["12","9","2","8","17","11","19","16","10","22","14","19","20","21","25","15","26","10","13","28","23","24","18","27"]}';
 	public $blogDefaultCategoryId = '15';
 	public $blogDefaultUserId = '972';
 	public $blogFeatured = '1';
