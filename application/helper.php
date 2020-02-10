@@ -410,29 +410,21 @@ class ConverterHelper
 	 * Replace more URLs. Sometimes images or other content can be placed at root directory. So if we want to move all
 	 * these folders to, e.g. images we need to replace URLs to new location.
 	 *
-	 * TODO Change method to support list of URLs.
-	 *
-	 * @param   string    $text     Content where to replace.
-	 * @param   Registry  $config   Converter config object.
+	 * @param   string  $text   Content where to replace.
+	 * @param   string  $urls   JSON object with URLs.
 	 *
 	 * @return  string
 	 * @since   0.1
 	 */
-	public static function replaceUrls($text, $config)
+	public static function replaceUrls($text, $urls)
 	{
-		if ($config->get('replaceOldUrls') == 1)
+		if (!empty($urls))
 		{
-			$text = str_ireplace(explode(',', $config->get('oldSiteURL')), $config->get('siteURL'), $text);
-		}
+			$urls = json_decode($urls);
 
-		if ($config->get('replaceUrlsExtra') == 1)
-		{
-			$search  = explode(',', $config->get('replaceUrlsExtraList'));
-			$replace = explode(',', $config->get('replaceUrlsExtraListBy'));
-
-			if (!empty($search) && !empty($replace))
+			if (property_exists($urls, 'oldUrl') && property_exists($urls, 'newUrl'))
 			{
-				$text = str_replace($search, $replace, $text);
+				$text = str_replace($urls->oldUrl, $urls->newUrl, $text);
 			}
 		}
 
