@@ -53,6 +53,19 @@ class InstallationControllerSave extends JControllerBase
 		// Check for validation errors.
 		if ($validData !== false)
 		{
+			// Fix trailing slashes in URL
+			$data['backupPath'] = rtrim($data['backupPath'], '/');
+			$data['siteURL'] = rtrim($data['siteURL'], '/');
+			$data['imgPathSmiles'] = rtrim($data['imgPathSmiles'], '/');
+			$data['imgPathBlog'] = rtrim($data['imgPathBlog'], '/');
+			$data['imgAttachPathBlogDst'] = rtrim($data['imgAttachPathBlogDst'], '/');
+			$data['imgPathNews'] = rtrim($data['imgPathNews'], '/');
+			$data['imgAttachPathNewsDst'] = rtrim($data['imgAttachPathNewsDst'], '/');
+			$data['imgPathLoads'] = rtrim($data['imgPathLoads'], '/');
+			$data['imgAttachPathLoadsDst'] = rtrim($data['imgAttachPathLoadsDst'], '/');
+			$data['imgPathPubl'] = rtrim($data['imgPathPubl'], '/');
+			$data['imgAttachPathPublDst'] = rtrim($data['imgAttachPathPublDst'], '/');
+
 			$model->writeConfigFile($data);
 			$app->enqueueMessage(JText::_('INSTL_CONFIG_SAVE_SUCCESS'));
 		}

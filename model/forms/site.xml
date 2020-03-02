@@ -15,7 +15,6 @@
 			   type="text"
 			   label="INSTL_BACKUP_PATH_LABEL"
 			   description="INSTL_BACKUP_PATH_DESC"
-			   id="backup_path"
 			   class="span12"
 			   required="true"
 		/>
@@ -25,6 +24,7 @@
 			   label="INSTL_SITE_URL_LABEL"
 			   description="INSTL_SITE_URL_DESC"
 			   class="span12"
+			   required="true"
 		/>
 
 		<field name="fromCategoryImports"
@@ -119,15 +119,15 @@
 		<field type="spacer" name="spacer1" label="INSTL_IMGATTACH_SEPARATOR"/>
 
 		<field name="imgAttachCopy"
-			   type="radio"
+			   type="list"
 			   label="INSTL_IMGATTACH_COPY_LABEL"
 			   description="INSTL_IMGATTACH_COPY_DESC"
 			   default="0"
 			   class="btn-group"
 			   size="1"
 		>
-			<option value="0">JYES</option>
-			<option value="1">JNO</option>
+			<option value="0">INSTL_IMGATTACH_COPY_0</option>
+			<option value="1">INSTL_IMGATTACH_COPY_1</option>
 		</field>
 
 		<field name="imgAttachFilesPerFolder"

@@ -162,7 +162,7 @@ class ConverterHelper
 	 *
 	 * @param   integer  $lenght   Length.
 	 *
-	 * @return  string
+	 * @return  string|false
 	 * @since   0.1
 	 * @throws  Exception
 	 */
@@ -181,7 +181,9 @@ class ConverterHelper
 			throw new Exception('No cryptographically secure random function available');
 		}
 
-		return substr(bin2hex($bytes), 0, $lenght);
+		$str = substr(bin2hex($bytes), 0, $lenght);
+
+		return $str !== false ? $str : false;
 	}
 
 	/**
@@ -349,19 +351,132 @@ class ConverterHelper
 	}
 
 	/**
-	 * Replace smiles.
+	 * Replace Ucoz <!--IMG--> tag with link by lightbox.
 	 *
-	 * @param   string    $text     Content where to replace.
-	 * @param   Registry  $config   Converter config object.
+	 * @param   string  $text      Content where to replace.
+	 * @param   string  $type      Content type. Can be blog, news, load, publ.
+	 * @param   string  $url       URL to images.
+	 * @param   string  $siteUrl   Old site URL.
 	 *
 	 * @return  string
 	 * @since   0.1
 	 */
-	public static function replaceSmiles($text, $config)
+	public static function replaceImageTagByLightbox($text, $type, $url, $siteUrl)
 	{
-		$imgUrlSmiles = $config->get('siteURL') . $config->get('imgPathSmiles');
-		$pattern  = '#<img[^>]+src="(.+?)\/sm\/(.+?)\/(.+?).gif"[^>]+>#';
-		$replace  = '<img src="' . $imgUrlSmiles . '$3.gif" alt="$3" align="absmiddle" border="0">';
+		if ($type == 'blog')
+		{
+			$urlPart = '_bl';
+		}
+		elseif ($type == 'news')
+		{
+			$urlPart = '_nw';
+		}
+		elseif ($type == 'publ')
+		{
+			$urlPart = '_pu';
+		}
+		elseif ($type == 'load')
+		{
+			$urlPart = '_ld';
+		}
+		else
+		{
+			return $text;
+		}
+
+		$pattern = '#<!--IMG[^>]+><a[^>]+href="(.+?)\/' . $urlPart . '\/(.+?)\/(.+?)"[^>]*><img[^>]+style="(.+?)"\s+src="(.+?)\/'
+			. $urlPart . '\/(.+?)\/(.+?)"[^>]+><\/a><!--IMG[^>]+>#u';
+
+		// Perform match and replace URL only for current site, because articles can have a links to other Ucoz blogs.
+		preg_match_all($pattern, $text, $matches);
+
+		foreach ($matches[1] as $href)
+		{
+			if (stripos($href, $siteUrl) !== false)
+			{
+				$replace = '<a href="' . $url . '/' . $urlPart . '/$2/$3" class="lightbox"><img src="' . $url . '/'
+					. $urlPart . '/$6/$7" alt="" style="$4" /></a>';
+			}
+			else
+			{
+				$replace = '<a href="$1/' . $urlPart . '/$2/$3" class="lightbox"><img src="$5/' . $urlPart . '/$6/$7" alt="" style="$4" /></a>';
+			}
+
+			$text = preg_replace($pattern, $replace, $text, 1);
+		}
+
+		return $text;
+	}
+
+	/**
+	 * Replace Ucoz <!--IMG--> tag by native HTML <img/>.
+	 *
+	 * @param   string  $text      Content where to replace.
+	 * @param   string  $type      Content type. Can be blog, news, load, publ.
+	 * @param   string  $url       URL to images.
+	 * @param   string  $siteUrl   Old site URL.
+	 *
+	 * @return  string
+	 * @since   0.1
+	 */
+	public static function replaceImageTagByHtmlImage($text, $type, $url, $siteUrl)
+	{
+		if ($type == 'blog')
+		{
+			$urlPart = '_bl';
+		}
+		elseif ($type == 'news')
+		{
+			$urlPart = '_nw';
+		}
+		elseif ($type == 'publ')
+		{
+			$urlPart = '_pu';
+		}
+		elseif ($type == 'load')
+		{
+			$urlPart = '_ld';
+		}
+		else
+		{
+			return $text;
+		}
+
+		$pattern = '#<!--IMG[^>]+><img[^>]+style="(.+?)"\s+src="(.+?)\/' . $urlPart . '\/(.+?)\/(.+?)"[^>]+><!--IMG[^>]+>#u';
+
+		// Perform match and replace URL only for current site, because articles can have a links to other Ucoz blogs.
+		preg_match_all($pattern, $text, $matches);
+
+		foreach ($matches[1] as $href)
+		{
+			if (stripos($href, $siteUrl) !== false)
+			{
+				$replace = '<img src="' . $url . '/' . $urlPart . '/$3/$4" style="$1" /></a>';
+			}
+			else
+			{
+				$replace = '<img src="$2/' . $urlPart . '/$3/$4" style="$1" />';
+			}
+
+			$text = preg_replace($pattern, $replace, $text, 1);
+		}
+
+		return $text;
+	}
+
+	/**
+	 * Replace smiles.
+	 *
+	 * @param   string  $text   Content where to replace.
+	 * @param   string  $url    Url to smiles.
+	 *
+	 * @return  string
+	 * @since   0.1
+	 */
+	public static function replaceSmiles($text, $url)
+	{
+		$pattern = '#<img[^>]+src="(.+?)\/sm\/(.+?)\/(.+?).gif"[^>]+>#';
+		$replace = '<img src="' . $url . '/$3.gif" alt="$3" align="absmiddle" border="0">';
 
 		return preg_replace($pattern, $replace, $text);
 	}
