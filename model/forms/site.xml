@@ -130,19 +130,8 @@
 			<option value="1">INSTL_IMGATTACH_COPY_1</option>
 		</field>
 
-		<field name="imgAttachFilesPerFolder"
-			   type="number"
-			   label="INSTL_IMGATTACH_FILES_PER_FOLDER_LABEL"
-			   description="INSTL_IMGATTACH_FILES_PER_FOLDER_DESC"
-			   default="200"
-			   min="200"
-			   max="10000"
-			   step="100"
-			   filter="integer"
-		/>
-
 		<field name="imgThumbWidth"
-			   type="text"
+			   type="number"
 			   label="INSTL_IMGATTACH_WIDTH_LABEL"
 			   description="INSTL_IMGATTACH_WIDTH_DESC"
 			   default="200"

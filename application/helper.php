@@ -10,7 +10,6 @@
 defined('_JEXEC') or die;
 
 use Joomla\Filesystem\File;
-use Joomla\Filesystem\Folder;
 use Joomla\Filesystem\Path;
 use Joomla\Registry\Registry;
 use Joomla\String\StringHelper;
@@ -158,68 +157,6 @@ class ConverterHelper
 	}
 
 	/**
-	 * Generate UID.
-	 *
-	 * @param   integer  $lenght   Length.
-	 *
-	 * @return  string|false
-	 * @since   0.1
-	 * @throws  Exception
-	 */
-	public static function generateUID($lenght = 12)
-	{
-		if (function_exists('random_bytes'))
-		{
-			$bytes = random_bytes(ceil($lenght / 2));
-		}
-		elseif (function_exists('openssl_random_pseudo_bytes'))
-		{
-			$bytes = openssl_random_pseudo_bytes(ceil($lenght / 2));
-		}
-		else
-		{
-			throw new Exception('No cryptographically secure random function available');
-		}
-
-		$str = substr(bin2hex($bytes), 0, $lenght);
-
-		return $str !== false ? $str : false;
-	}
-
-	/**
-	 * Get list of folders with attached images.
-	 *
-	 * @param   string  $path   Image path.
-	 *
-	 * @return  array|boolean   Boolean false if folder inaccessible.
-	 * @since   0.1
-	 */
-	public static function listFolders($path)
-	{
-		try
-		{
-			$path = Path::clean($path);
-		}
-		catch (UnexpectedValueException $e)
-		{
-			echo $e->getMessage() . "\n";
-
-			return false;
-		}
-
-		if (is_dir($path))
-		{
-			$paths = Folder::folders($path, '.', false, true);
-		}
-		else
-		{
-			$paths = false;
-		}
-
-		return $paths;
-	}
-
-	/**
 	 * Load categories from source.
 	 *
 	 * @param   string    $type     Content type. Can be 'blog', 'publ', 'loads', 'news'.
@@ -332,8 +269,7 @@ class ConverterHelper
 	 * @param   string   $alias        Alias.
 	 * @param   string   $title        Title.
 	 *
-	 * @return	array  Contains the modified title and alias.
-	 *
+	 * @return	array   Contains the modified title and alias.
 	 * @since	0.1
 	 */
 	public static function generateNewTitle($categoryID, $alias, $title)
