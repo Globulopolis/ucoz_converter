@@ -225,44 +225,6 @@ class ConverterHelper
 	}
 
 	/**
-	 * Generate alias.
-	 *
-	 * @param   array  $data   Item data.
-	 *
-	 * @return  string
-	 * @since   0.1
-	 */
-	public static function generateAlias($data)
-	{
-		if (JFactory::getConfig()->get('unicodeslugs') == 1)
-		{
-			$data['alias'] = JFilterOutput::stringURLUnicodeSlug($data['title']);
-		}
-		else
-		{
-			$data['alias'] = JFilterOutput::stringURLSafe($data['title']);
-		}
-
-		$table = JTable::getInstance('Content', 'JTable');
-
-		if ($table->load(array('alias' => $data['alias'], 'catid' => $data['catid'])))
-		{
-			$msg = JText::_('COM_CONTENT_SAVE_WARNING') . "\n";
-		}
-
-		/** @noinspection  PhpUnusedLocalVariableInspection */
-		list($title, $alias) = self::generateNewTitle($data['catid'], $data['alias'], $data['title']);
-		$data['alias'] = $alias;
-
-		if (isset($msg))
-		{
-			echo $msg;
-		}
-
-		return $alias;
-	}
-
-	/**
 	 * Method to change the title & alias.
 	 *
 	 * @param   integer  $categoryID   The id of the category.

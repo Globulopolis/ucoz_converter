@@ -67,12 +67,6 @@ catch (Exception $e)
 Class ConverterBlog extends JApplicationCli
 {
 	/**
-	 * @var    array   Array holds article data for Joomla.
-	 * @since  0.1
-	 */
-	protected $data = array();
-
-	/**
 	 * Convert news and import in Joomla database.
 	 *
 	 * @return  void
@@ -107,7 +101,7 @@ Class ConverterBlog extends JApplicationCli
 
 		foreach ($content as $i => $line)
 		{
-			if ($i > 1)
+			if ($i > 0)
 			{
 				//break;
 			}
@@ -115,6 +109,7 @@ Class ConverterBlog extends JApplicationCli
 			// Replace Ucoz attachments separator by tag
 			$line = str_replace('\|', '<attachment_sep>', $line);
 
+			$data     = array();
 			$model    = JModelLegacy::getInstance('Article', 'ContentModel');
 			$column   = explode('|', $line);
 			$msgLine  = ($i + 1) . ' of ' . $totalRows . '. Article: ';
@@ -144,12 +139,12 @@ Class ConverterBlog extends JApplicationCli
 				'robots' => 'index, follow', 'author' => '', 'rights' => '', 'xreference' => ''
 			);
 
-			$this->data['title']   = $filter->clean($column[11]);
-			$this->data['catid']   = ConverterHelper::getCategory($column[1], 'blog', $config);
-			$date                  = sprintf('%04d-%02d-%02d', $column[2], $column[3], $column[4]);
-			$this->data['created'] = $date . ' ' . gmdate("H:i:s", $filter->clean(($column[8] + date('Z')), 'int'));
-			$introtext             = $column[12];
-			$fulltext              = str_replace('<newline>', "\n", $column[13]);
+			$data['title']   = $filter->clean($column[11]);
+			$data['catid']   = ConverterHelper::getCategory($column[1], 'blog', $config);
+			$date            = sprintf('%04d-%02d-%02d', $column[2], $column[3], $column[4]);
+			$data['created'] = $date . ' ' . gmdate("H:i:s", $filter->clean(($column[8] + date('Z')), 'int'));
+			$introtext       = $column[12];
+			$fulltext        = str_replace('<newline>', "\n", $column[13]);
 
 			// Sometimes introtext can be empty. So check it and if empty - try to create from fulltext.
 			if (!empty($introtext))
@@ -272,49 +267,47 @@ Class ConverterBlog extends JApplicationCli
 			// Final filter text if needed. May strip html.
 			if ($config->get('filterText') === 1)
 			{
-				$this->data['fulltext']  = ComponentHelper::filterText($fulltext);
-				$this->data['introtext'] = ComponentHelper::filterText($introtext);
+				$data['fulltext']  = ComponentHelper::filterText($fulltext);
+				$data['introtext'] = ComponentHelper::filterText($introtext);
 			}
 			else
 			{
-				$this->data['fulltext']  = $fulltext;
-				$this->data['introtext'] = $introtext;
+				$data['fulltext']  = $fulltext;
+				$data['introtext'] = $introtext;
 			}
 
 			// Get a new article ID, so we can update instead of save.
 			if (array_key_exists($column[0], $articlesIDs))
 			{
-				$this->data['id'] = $articlesIDs[$column[0]];
+				$data['id'] = (int) $articlesIDs[$column[0]];
 				$isNew = 0;
 
-				// Try to make an unique alias. Article title is not unique in Ucoz.
-				if ($config->get('updateAlias') == 1)
-				{
-					// TODO This break alias
-					// $this->data['alias'] = ConverterHelper::generateAlias($this->data);
-				}
+				// TODO Make a new article title if title is allready exists in DB.
+				/** @noinspection  PhpUnusedLocalVariableInspection */
+				// list($title, $alias) = ConverterHelper::generateNewTitle($data['catid'], $data['alias'], $data['title']);
+				// $data['title'] = $title;
 			}
 			else
 			{
 				$isNew = 1;
 			}
 
-			$this->data['images']      = json_encode($images);
-			$this->data['urls']        = json_encode($urls);
-			$this->data['attribs']     = json_encode($attribs);
-			$this->data['hits']        = $filter->clean($column[16], 'int');
-			$this->data['metadata']    = json_encode($metadata);
-			$this->data['language']    = (string) $config->get('articlesLang');
-			$this->data['access']      = 1;
-			$this->data['state']       = (int) $config->get('blogState');
-			$this->data['created_by']  = (int) $config->get('blogDefaultUserId');
-			$this->data['modified']    = HtmlHelper::date($filter->clean($column[29], 'int'), 'Y-m-d H:i:s');
-			$this->data['modified_by'] = (int) $config->get('blogDefaultUserId');
-			$this->data['publish_up']  = $this->data['created'];
-			$this->data['featured']    = (int) $config->get('blogFeatured');
-			$this->data['rules']       = array('core.edit.delete' => array(), 'core.edit.edit' => array(), 'core.edit.state' => array());
+			$data['images']      = json_encode($images);
+			$data['urls']        = json_encode($urls);
+			$data['attribs']     = json_encode($attribs);
+			$data['hits']        = $filter->clean($column[16], 'int');
+			$data['metadata']    = json_encode($metadata);
+			$data['language']    = (string) $config->get('articlesLang');
+			$data['access']      = 1;
+			$data['state']       = (int) $config->get('blogState');
+			$data['created_by']  = (int) $config->get('blogDefaultUserId');
+			$data['modified']    = HtmlHelper::date($filter->clean($column[29], 'int'), 'Y-m-d H:i:s');
+			$data['modified_by'] = (int) $config->get('blogDefaultUserId');
+			$data['publish_up']  = $data['created'];
+			$data['featured']    = (int) $config->get('blogFeatured');
+			$data['rules']       = array('core.edit.delete' => array(), 'core.edit.edit' => array(), 'core.edit.state' => array());
 
-			if (!$model->save($this->data))
+			if (!$model->save($data))
 			{
 				$totalErrors++;
 				$msg = $msgLine . 'ID: ' . $column[0] . '. ' . Text::_('JERROR_AN_ERROR_HAS_OCCURRED') . ' ' . $model->getError();
@@ -333,7 +326,7 @@ Class ConverterBlog extends JApplicationCli
 				else
 				{
 					$insertId = $articlesIDs[$column[0]];
-					$model->featured($insertId, $this->data['featured']);
+					$model->featured($insertId, $data['featured']);
 					$txt = ' - Updated.';
 				}
 

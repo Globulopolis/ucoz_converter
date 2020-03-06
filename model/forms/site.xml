@@ -74,18 +74,6 @@
 			<option value="0">JNO</option>
 		</field>
 
-		<field name="updateAlias"
-			   type="radio"
-			   label="INSTL_UPDATE_ALIAS_LABEL"
-			   description="INSTL_UPDATE_ALIAS_DESC"
-			   default="1"
-			   class="btn-group"
-			   size="1"
-		>
-			<option value="1">JYES</option>
-			<option value="0">JNO</option>
-		</field>
-
 		<field name="replaceUrls"
 			   type="repeatable"
 			   icon="list"
