@@ -189,7 +189,7 @@ Class ConverterBlog extends JApplicationCli
 						$filename  = $fileInfo[0] . '.' . $fileInfo[1];
 						$thumbFilename = 's' . $fileInfo[0] . '.' . $fileInfo[1];
 
-						if (is_file($srcFolder . $filename))
+						if (is_file($srcFolder . $filename) || is_file($dstFolder . $filename))
 						{
 							if (!is_dir($dstFolder))
 							{
@@ -281,14 +281,13 @@ Class ConverterBlog extends JApplicationCli
 			{
 				$data['id'] = (int) $articlesIDs[$column[0]];
 				$isNew = 0;
-
-				// TODO Make a new article title if title is allready exists in DB.
-				/** @noinspection  PhpUnusedLocalVariableInspection */
-				// list($title, $alias) = ConverterHelper::generateNewTitle($data['catid'], $data['alias'], $data['title']);
-				// $data['title'] = $title;
 			}
 			else
 			{
+				// TODO Make a new article title for duplicate articles title?
+				/** @noinspection  PhpUnusedLocalVariableInspection */
+				// list($title, $alias) = ConverterHelper::generateNewTitle($data['catid'], $data['alias'], $data['title']);
+				// $data['title'] = $title;
 				$isNew = 1;
 			}
 
