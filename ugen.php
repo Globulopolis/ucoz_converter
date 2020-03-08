@@ -222,6 +222,8 @@ Class ConverterUgen extends JApplicationCli
 				}
 			}
 
+			$outputLog .= $msg;
+
 			echo $msg;
 		}
 

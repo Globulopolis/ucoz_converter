@@ -99,6 +99,8 @@ Class ConverterBlog extends JApplicationCli
 		$articlesIDs   = ConverterHelper::getAssocData(__DIR__ . '/imports/blog_ids.json');
 		$outputLog     = "======= " . date('Y-m-d H:i:s', time()) . " =======\n";
 
+		echo $outputLog;
+
 		foreach ($content as $i => $line)
 		{
 			if ($i > 0)
@@ -342,8 +344,12 @@ Class ConverterBlog extends JApplicationCli
 				// Save old ID and new ID in array to store in json file.
 				$articlesIDs[$column[0]] = $insertId;
 
-				echo $msgLine . 'ID ' . $insertId . $txt . "\n";
+				$msg = $msgLine . 'ID ' . $insertId . $txt . "\n";
 			}
+
+			$outputLog .= $msg;
+
+			echo $msg;
 		}
 
 		ConverterHelper::saveAssocData(__DIR__ . '/imports/blog_ids.json', $articlesIDs);
