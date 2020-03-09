@@ -17,7 +17,7 @@ require_once __DIR__ . '/defines.php';
 require_once __DIR__ . '/framework.php';
 
 // Register the Installation application
-JLoader::registerPrefix('Installation', JPATH_INSTALLATION);
+JLoader::registerPrefix('Installation', JPATH_CONVERTER);
 
 // Register the application's router due to non-standard include
 JLoader::register('JRouterInstallation', __DIR__ . '/router.php');

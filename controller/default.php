@@ -81,7 +81,7 @@ class InstallationControllerDefault extends JControllerBase
 
 		// Register the layout paths for the view
 		$paths = new SplPriorityQueue;
-		$paths->insert(JPATH_INSTALLATION . '/view/' . $vName . '/tmpl', 'normal');
+		$paths->insert(JPATH_CONVERTER . '/view/' . $vName . '/tmpl', 'normal');
 
 		$vClass = 'InstallationView' . ucfirst($vName) . ucfirst($vFormat);
 

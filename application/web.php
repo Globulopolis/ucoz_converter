@@ -260,7 +260,7 @@ final class InstallationApplicationWeb extends JApplicationCms
 	 */
 	public function getLocalise()
 	{
-		$xml = simplexml_load_file(JPATH_INSTALLATION . '/localise.xml');
+		$xml = simplexml_load_file(JPATH_CONVERTER . '/localise.xml');
 
 		if (!$xml)
 		{

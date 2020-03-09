@@ -131,7 +131,7 @@ class InstallationModelSetup extends JModelBase
 		jimport('joomla.filesystem.file');
 
 		// Set the configuration file path.
-		$file = JPATH_INSTALLATION . '/config.php';
+		$file = JPATH_CONVERTER . '/config.php';
 
 		// Get the new FTP credentials.
 		$ftp = JClientHelper::getCredentials('ftp', true);
@@ -291,8 +291,8 @@ class InstallationModelSetup extends JModelBase
 		$options[] = $option;
 
 		// Check for configuration file writable.
-		$writable = (is_writable(JPATH_INSTALLATION . '/config.php')
-			|| (!is_file(JPATH_INSTALLATION . '/config.php') && is_writable(JPATH_INSTALLATION)));
+		$writable = (is_writable(JPATH_CONVERTER . '/config.php')
+			|| (!is_file(JPATH_CONVERTER . '/config.php') && is_writable(JPATH_CONVERTER)));
 
 		$option = new stdClass;
 		$option->label  = JText::sprintf('INSTL_WRITABLE', 'config.php');

@@ -31,7 +31,7 @@ require_once JPATH_LIBRARIES . '/cms.php';
 // Pre-Load configuration. Don't remove the Output Buffering due to BOM issues, see JCode 26026
 ob_start();
 /** @noinspection PhpIncludeInspection */
-require_once JPATH_INSTALLATION . '/config.php';
+require_once JPATH_CONVERTER . '/config.php';
 ob_end_clean();
 
 // Import filesystem and utilities classes since they aren't autoloaded
