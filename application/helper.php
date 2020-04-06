@@ -117,9 +117,7 @@ class ConverterHelper
 	 */
 	public static function saveAssocData($file, $data)
 	{
-		$file = Path::clean($file);
-
-		if (file_put_contents($file, json_encode($data)))
+		if (file_put_contents(Path::clean($file), json_encode($data)))
 		{
 			return true;
 		}
@@ -157,45 +155,6 @@ class ConverterHelper
 	}
 
 	/**
-	 * Load categories from source.
-	 *
-	 * @param   string    $type     Content type. Can be 'blog', 'publ', 'loads', 'news'.
-	 * @param   Registry  $config   Converter config object.
-	 *
-	 * @return  array
-	 * @since   0.1
-	 */
-	public static function loadCategories($type, $config)
-	{
-		$categories = array();
-
-		if ((int) $config->get('fromCategoryImports') === 0)
-		{
-			$_categories = $config->get('categoriesAssoc');
-
-			if (!empty($_categories))
-			{
-				$_categories = json_decode($_categories);
-				$categories  = array_combine($_categories->categoriesUcoz, $_categories->categoriesJoomla);
-			}
-		}
-		elseif ((int) $config->get('fromCategoryImports') === 1)
-		{
-			if (is_file(Path::clean(JPATH_ROOT . '/cli/ucoz_converter/imports/categories_import.json')))
-			{
-				$categories = self::getAssocData(JPATH_ROOT . '/cli/ucoz_converter/imports/categories_import.json');
-
-				if (array_key_exists($type, $categories))
-				{
-					$categories = $categories[$type];
-				}
-			}
-		}
-
-		return $categories;
-	}
-
-	/**
 	 * Get Joomla category ID by Ucoz category ID.
 	 *
 	 * @param   integer   $id       Ucoz category ID.
@@ -207,18 +166,42 @@ class ConverterHelper
 	 */
 	public static function getCategory($id, $type, $config)
 	{
-		$categories = self::loadCategories($type, $config);
-
 		// Default category ID for Uncategorised items in com_content. Hardcoded in Joomla installation package.
 		$category = 2;
 
-		if (array_key_exists($id, $categories))
+		if ($config->get('fromCategoryImports') == 0)
 		{
-			$category = $categories[$id];
+			$_categories = $config->get('categoriesAssoc');
+
+			if (!empty($_categories))
+			{
+				$_categories = json_decode($_categories);
+				$categories  = array_combine($_categories->categoriesUcoz, $_categories->categoriesJoomla);
+
+				if (array_key_exists($id, $categories))
+				{
+					$category = $categories[$id];
+				}
+			}
 		}
-		elseif ($config->get('blogDefaultCategoryId') > 0)
+		elseif ($config->get('fromCategoryImports') == 1)
 		{
-			$category = $config->get('blogDefaultCategoryId');
+			if (is_file(Path::clean(JPATH_ROOT . '/ucoz_converter/imports/categories_import.json')))
+			{
+				$categories = self::getAssocData(JPATH_ROOT . '/ucoz_converter/imports/categories_import.json');
+
+				if (array_key_exists($type, $categories))
+				{
+					if (array_key_exists($id, $categories[$type]))
+					{
+						$category = $categories[$type][$id];
+					}
+				}
+			}
+		}
+		elseif ($config->get('fromCategoryImports') == 2)
+		{
+			$category = $config->get($type . 'DefaultCategoryId');
 		}
 
 		return (int) $category;
@@ -437,7 +420,10 @@ class ConverterHelper
 
 			if (property_exists($urls, 'oldUrl') && property_exists($urls, 'newUrl'))
 			{
-				$text = str_replace($urls->oldUrl, $urls->newUrl, $text);
+				foreach ($urls->oldUrl as $i => $url)
+				{
+					//$text = preg_replace('#' . preg_quote($url) . '#', $urls->newUrl[$i], $text, 1);
+				}
 			}
 		}
 

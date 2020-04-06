@@ -53,18 +53,19 @@ class InstallationControllerSave extends JControllerBase
 		// Check for validation errors.
 		if ($validData !== false)
 		{
-			// Fix trailing slashes in URL
-			$data['backupPath'] = rtrim($data['backupPath'], '/');
-			$data['siteURL'] = rtrim($data['siteURL'], '/');
-			$data['imgPathSmiles'] = rtrim($data['imgPathSmiles'], '/');
-			$data['imgPathBlog'] = rtrim($data['imgPathBlog'], '/');
-			$data['imgAttachPathBlogDst'] = rtrim($data['imgAttachPathBlogDst'], '/');
-			$data['imgPathNews'] = rtrim($data['imgPathNews'], '/');
-			$data['imgAttachPathNewsDst'] = rtrim($data['imgAttachPathNewsDst'], '/');
-			$data['imgPathLoads'] = rtrim($data['imgPathLoads'], '/');
-			$data['imgAttachPathLoadsDst'] = rtrim($data['imgAttachPathLoadsDst'], '/');
-			$data['imgPathPubl'] = rtrim($data['imgPathPubl'], '/');
-			$data['imgAttachPathPublDst'] = rtrim($data['imgAttachPathPublDst'], '/');
+			// Fix bad chars at the end of paths
+			$charlist = ' \t\n\r\0\x0B\/';
+			$data['backupPath'] = rtrim($data['backupPath'], $charlist);
+			$data['siteURL'] = rtrim($data['siteURL'], $charlist);
+			$data['imgPathSmiles'] = rtrim($data['imgPathSmiles'], $charlist);
+			$data['imgPathBlog'] = rtrim($data['imgPathBlog'], $charlist);
+			$data['imgAttachPathBlogDst'] = rtrim($data['imgAttachPathBlogDst'], $charlist);
+			$data['imgPathNews'] = rtrim($data['imgPathNews'], $charlist);
+			$data['imgAttachPathNewsDst'] = rtrim($data['imgAttachPathNewsDst'], $charlist);
+			$data['imgPathLoads'] = rtrim($data['imgPathLoads'], $charlist);
+			$data['imgAttachPathLoadsDst'] = rtrim($data['imgAttachPathLoadsDst'], $charlist);
+			$data['imgPathPubl'] = rtrim($data['imgPathPubl'], $charlist);
+			$data['imgAttachPathPublDst'] = rtrim($data['imgAttachPathPublDst'], $charlist);
 
 			$model->writeConfigFile($data);
 			$app->enqueueMessage(JText::_('INSTL_CONFIG_SAVE_SUCCESS'));

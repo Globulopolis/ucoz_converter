@@ -74,6 +74,26 @@
 			<option value="0">JNO</option>
 		</field>
 
+		<field name="introtextTpl"
+			   type="textarea"
+			   label="INSTL_TPL_INTROTEXT_LABEL"
+			   description="INSTL_TPL_TEXT_DESC"
+			   rows="3"
+			   cols="30"
+			   class="span12"
+			   spellcheck="false"
+		/>
+
+		<field name="fulltextTpl"
+			   type="textarea"
+			   label="INSTL_TPL_FULLTEXT_LABEL"
+			   description="INSTL_TPL_TEXT_DESC"
+			   rows="3"
+			   cols="30"
+			   class="span12"
+			   spellcheck="false"
+		/>
+
 		<field name="replaceUrls"
 			   type="repeatable"
 			   icon="list"
@@ -128,6 +148,36 @@
 			   step="10"
 			   filter="integer"
 		/>
+
+		<field name="tplThumbSpan"
+			   type="list"
+			   label="INSTL_TPL_THUMBSPAN_LABEL"
+			   description="INSTL_TPL_THUMBSPAN_DESC"
+			   default="span2"
+		>
+			<option value="span1">span1</option>
+			<option value="span2">span2</option>
+			<option value="span3">span3</option>
+			<option value="span4">span4</option>
+			<option value="span5">span5</option>
+			<option value="span6">span6</option>
+			<option value="span7">span7</option>
+			<option value="span8">span8</option>
+			<option value="span9">span9</option>
+			<option value="span10">span10</option>
+			<option value="span11">span11</option>
+			<option value="span12">span12</option>
+		</field>
+
+		<field name="tplAttachAlign"
+			   type="list"
+			   label="INSTL_TPL_IMGALIGN_LABEL"
+			   default="left"
+		>
+			<option value="left">INSTL_IMGATTACH_ALIGN_0</option>
+			<option value="center">INSTL_IMGATTACH_ALIGN_1</option>
+			<option value="right">INSTL_IMGATTACH_ALIGN_2</option>
+		</field>
 	</fieldset>
 
 	<fieldset name="categories" addfieldpath="ucoz_converter/model/fields/">
