@@ -169,7 +169,7 @@ class ConverterHelper
 		// Default category ID for Uncategorised items in com_content. Hardcoded in Joomla installation package.
 		$category = 2;
 
-		if ($config->get('fromCategoryImports') == 0)
+		if ((int) $config->get('fromCategoryImports') === 0)
 		{
 			$_categories = $config->get('categoriesAssoc');
 
@@ -184,7 +184,7 @@ class ConverterHelper
 				}
 			}
 		}
-		elseif ($config->get('fromCategoryImports') == 1)
+		elseif ((int) $config->get('fromCategoryImports') === 1)
 		{
 			if (is_file(Path::clean(JPATH_ROOT . '/ucoz_converter/imports/categories_import.json')))
 			{
@@ -199,7 +199,7 @@ class ConverterHelper
 				}
 			}
 		}
-		elseif ($config->get('fromCategoryImports') == 2)
+		elseif ((int) $config->get('fromCategoryImports') === 2)
 		{
 			$category = $config->get($type . 'DefaultCategoryId');
 		}
@@ -357,7 +357,7 @@ class ConverterHelper
 	public static function replaceSmiles($text, $url)
 	{
 		$pattern = '#<img[^>]+src="(.+?)\/sm\/(.+?)\/(.+?).gif"[^>]+>#';
-		$replace = '<img src="' . $url . '/$3.gif" alt="$3" align="absmiddle" border="0">';
+		$replace = '<img src="' . $url . '/$3.gif" alt="$3" align="absmiddle" border="0" />';
 
 		return preg_replace($pattern, $replace, $text);
 	}
@@ -416,14 +416,11 @@ class ConverterHelper
 	{
 		if (!empty($urls))
 		{
-			$urls = json_decode($urls);
+			$urls = json_decode($urls, true);
 
-			if (property_exists($urls, 'oldUrl') && property_exists($urls, 'newUrl'))
+			if (array_key_exists('oldUrl', $urls) && array_key_exists('newUrl', $urls))
 			{
-				foreach ($urls->oldUrl as $i => $url)
-				{
-					//$text = preg_replace('#' . preg_quote($url) . '#', $urls->newUrl[$i], $text, 1);
-				}
+				$text = strtr($text, array_combine($urls['oldUrl'], $urls['newUrl']));
 			}
 		}
 
