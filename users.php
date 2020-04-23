@@ -122,7 +122,15 @@ Class ConverterUsers extends JApplicationCli
 		$totalUsersError    = 0;
 		$ids                = ConverterHelper::getAssocData(__DIR__ . '/imports/users_import.json');
 		$regTxt             = '';
+		$skipBanned         = (int) $config->get('skipBanned');
+		$_banned            = '';
 		$outputLog          = "======= " . date('Y-m-d H:i:s', time()) . " =======\n";
+
+		if ($skipBanned === 1)
+		{
+			$_banned = file_get_contents(__DIR__ . '/imports/users_blocked.json');
+			$_banned = json_decode($_banned);
+		}
 
 		// Process users
 		foreach ($users as $i => $line)
@@ -130,6 +138,16 @@ Class ConverterUsers extends JApplicationCli
 			$columnUser               = explode('|', $line);
 			$username                 = $filter->clean($columnUser[0], 'username');
 			$msgLine                  = ($i + 1) . ' of ' . $totalUsers . '. User: ';
+
+			// Skip blocked user
+			if ($skipBanned === 1 && in_array($username, $_banned))
+			{
+				$msg = $msgLine . $username . ' - blocked and skipped.';
+				$outputLog .= $msg . "\n";
+				echo $msg . "\n";
+
+				continue;
+			}
 
 			$userData                 = array();
 			$userData['id']           = '';
