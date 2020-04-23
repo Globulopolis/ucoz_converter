@@ -50,6 +50,7 @@ class ConverterConfig {
 	public $imgPathPubl = 'images/posts';
 	public $imgAttachPathPublDst = 'D:/WWW/htdocs/1/images/publ';
 	public $skipRegistered = '0';
+	public $skipBanned = '1';
 	public $requirePassReset = '1';
 	public $doExtraFields = '1';
 	public $isComprofiler = '0';

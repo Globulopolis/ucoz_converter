@@ -541,6 +541,19 @@
 			<option value="0">JNO</option>
 		</field>
 
+		<field name="skipBanned"
+			   type="radio"
+			   label="INSTL_SKIP_BANNED_LABEL"
+			   description="INSTL_SKIP_BANNED_DESC"
+			   id="skip_banned"
+			   class="btn-group"
+			   default="0"
+			   filter="integer"
+		>
+			<option value="1">JYES</option>
+			<option value="0">JNO</option>
+		</field>
+
 		<field name="requirePassReset"
 			   type="radio"
 			   label="INSTL_PASS_RESET_LABEL"

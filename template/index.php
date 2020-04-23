@@ -47,6 +47,7 @@ JText::script('JLIB_JS_AJAX_ERROR_TIMEOUT');
 // Load the JavaScript translated messages
 JText::script('INSTL_PROCESS_BUSY');
 JText::script('JGLOBAL_SELECT_AN_OPTION');
+JText::script('INSTL_SKIP_BANNED_ALERT');
 
 // Add script options
 $this->addScriptOptions('system.installation', array('url' => JRoute::_('index.php')));

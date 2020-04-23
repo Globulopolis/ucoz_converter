@@ -11,7 +11,12 @@
  * This is a script to convert users parameters from Ucoz to Joomla which should be called from the command-line, not the web.
  * Example: /path/to/php /path/to/site/ucoz_converter/ugen.php
  *
- * NOTE! Run this file only after users.php.
+ * NOTE! Run this file only after users.php except you're want to get banned users.
+ *
+ * Optional parameter:
+ * --banned - get banned users and store into json file(users_blocked.json).
+ *
+ * Example: /path/to/php /path/to/site/ucoz_converter/ugen.php --banned
  */
 
 const _JEXEC = 1;
@@ -87,6 +92,9 @@ Class ConverterUgen extends JApplicationCli
 		$lang = Factory::getLanguage();
 		$lang->load('lib_joomla');
 
+		// Get cmd options
+		$opts = getopt("", array('banned' => 'banned::'));
+
 		$this->config = ConverterHelper::loadConfig();
 		$backupPath   = Path::clean($this->config->get('backupPath') . '/_s1/ugen.txt');
 		$usersParams  = ConverterHelper::loadBackupFile($backupPath);
@@ -105,6 +113,13 @@ Class ConverterUgen extends JApplicationCli
 		$totalUsersBlocked = 0;
 		$ids               = ConverterHelper::getAssocData(__DIR__ . '/imports/users_import.json');
 		$blocked           = array();
+
+		if (array_key_exists('banned', $opts))
+		{
+			$this->getBannedUsers($usersParams);
+
+			return;
+		}
 
 		if (empty($ids) || is_object($ids))
 		{
@@ -137,7 +152,7 @@ Class ConverterUgen extends JApplicationCli
 			// Set user to blocked.
 			if ((int) $column[3] > 0)
 			{
-				$block = 1;
+				$block     = 1;
 				$blocked[] = $username;
 				$totalUsersBlocked++;
 
@@ -265,6 +280,35 @@ Class ConverterUgen extends JApplicationCli
 		}
 
 		return (int) $gid;
+	}
+
+	/**
+	 * Get banned users and save into json.
+	 *
+	 * @param   array  $usersParams  Array of user params.
+	 *
+	 * @return  void
+	 * @since   0.1
+	 */
+	protected function getBannedUsers(&$usersParams)
+	{
+		$filter  = new InputFilter;
+		$blocked = array();
+
+		foreach ($usersParams as $i => $line)
+		{
+			// Replace \| by <separator> to avoid wrong column count. E.g. for ban reason.
+			$line = str_replace('\|', '<separator>', $line);
+
+			$column = explode('|', $line);
+
+			if ((int) $column[3] > 0)
+			{
+				$blocked[] = $filter->clean($column[1], 'username');
+			}
+		}
+
+		ConverterHelper::saveAssocData(__DIR__ . '/imports/users_blocked.json', $blocked);
 	}
 }
 

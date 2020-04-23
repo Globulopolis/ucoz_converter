@@ -177,6 +177,10 @@ function initElements()
 					}
 				}
 
+				if (label.closest('.btn-group').attr('id') === 'jform_skip_banned' && $('#jform_skip_banned').next('.skip_banned_text').length === 0) {
+					$('#jform_skip_banned').after('<div class="skip_banned_text alert"><button type="button" class="close" data-dismiss="alert">&times;</button>' + Joomla.Text._('INSTL_SKIP_BANNED_ALERT', '') + '</div>');
+				}
+
 				input.prop('checked', true);
 			}
 		});
@@ -216,6 +220,11 @@ function initElements()
 				}
 			}
 		});
+
+		if ($('#jform_skip_banned input').prop('checked'))
+		{
+			$('#jform_skip_banned').after('<div class="skip_banned_text alert"><button type="button" class="close" data-dismiss="alert">&times;</button>' + Joomla.Text._('INSTL_SKIP_BANNED_ALERT', '') + '</div>');
+		}
 
 		// Attach close button to repeatable modal
 		$('.inst-subform').find('thead th:last div:last').after('<button type="button" class="close novalidate" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>');
