@@ -58,8 +58,6 @@ catch (Exception $e)
 	jexit($e->getMessage());
 }
 
-JLoader::register('ContentModelArticle', JPATH_ADMINISTRATOR . '/components/com_content/models/article.php');
-
 /**
  * Class for articles management.
  *
@@ -129,8 +127,7 @@ Class ConverterDeleteArticles extends JApplicationCli
 			jexit('Could not load file at ' . $type . '_ids.json. Maybe file is empty.' . "\n");
 		}
 
-		$model        = new ContentModelArticle;
-		$table        = $model->getTable();
+		$table        = JTable::getInstance('Content', 'JTable', array());
 		$db           = Factory::getDbo();
 		$totalRows    = count($articlesIDs);
 		$totalDeleted = 0;
