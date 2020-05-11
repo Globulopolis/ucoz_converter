@@ -69,7 +69,7 @@ class InstallationControllerSave extends JControllerBase
 			$data['imgAttachPathPublDst'] = rtrim($data['imgAttachPathPublDst'], $charlist);
 
 			// Convert list of comma separated IDs to JSON
-			if (!empty($blogExcludeID))
+			if (!empty($data['blogExcludeID']))
 			{
 				$blogExcludeID         = explode(',', $data['blogExcludeID']);
 				$blogExcludeID         = ArrayHelper::arrayUnique($blogExcludeID);
@@ -77,7 +77,7 @@ class InstallationControllerSave extends JControllerBase
 				$data['blogExcludeID'] = json_encode($blogExcludeID);
 			}
 
-			if (!empty($newsExcludeID))
+			if (!empty($data['newsExcludeID']))
 			{
 				$newsExcludeID         = explode(',', $data['newsExcludeID']);
 				$newsExcludeID         = ArrayHelper::arrayUnique($newsExcludeID);
@@ -85,7 +85,7 @@ class InstallationControllerSave extends JControllerBase
 				$data['newsExcludeID'] = json_encode($newsExcludeID);
 			}
 
-			if (!empty($loadsExcludeID))
+			if (!empty($data['loadsExcludeID']))
 			{
 				$loadsExcludeID         = explode(',', $data['loadsExcludeID']);
 				$loadsExcludeID         = ArrayHelper::arrayUnique($loadsExcludeID);
@@ -93,7 +93,7 @@ class InstallationControllerSave extends JControllerBase
 				$data['loadsExcludeID'] = json_encode($loadsExcludeID);
 			}
 
-			if (!empty($publExcludeID))
+			if (!empty($data['publExcludeID']))
 			{
 				$publExcludeID         = explode(',', $data['publExcludeID']);
 				$publExcludeID         = ArrayHelper::arrayUnique($publExcludeID);

@@ -39,6 +39,11 @@ class InstallationModelSetup extends JModelBase
 			$data['language'] = $temp['language'];
 		}
 
+		$data['blogExcludeID']  = !empty($data['blogExcludeID']) ? implode(',', json_decode($data['blogExcludeID'])) : '';
+		$data['newsExcludeID']  = !empty($data['newsExcludeID']) ? implode(',', json_decode($data['newsExcludeID'])) : '';
+		$data['loadsExcludeID'] = !empty($data['loadsExcludeID']) ? implode(',', json_decode($data['loadsExcludeID'])) : '';
+		$data['publExcludeID']  = !empty($data['publExcludeID']) ? implode(',', json_decode($data['publExcludeID'])) : '';
+
 		return $data;
 	}
 
