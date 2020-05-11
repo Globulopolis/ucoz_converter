@@ -28,6 +28,7 @@ class ConverterConfig {
 	public $blogIntroLimit = '400';
 	public $imgPathBlog = 'images/blog';
 	public $imgAttachPathBlogDst = 'D:/WWW/htdocs/1/images/blog';
+	public $blogExcludeID = '';
 	public $newsDefaultCategoryId = '22';
 	public $newsDefaultUserId = '972';
 	public $newsFeatured = '1';
@@ -35,6 +36,7 @@ class ConverterConfig {
 	public $newsIntroLimit = '400';
 	public $imgPathNews = 'images/news';
 	public $imgAttachPathNewsDst = 'D:/WWW/htdocs/1/images/news';
+	public $newsExcludeID = '';
 	public $loadsDefaultCategoryId = '23';
 	public $loadsDefaultUserId = '972';
 	public $loadsFeatured = '1';
@@ -42,6 +44,7 @@ class ConverterConfig {
 	public $loadsIntroLimit = '400';
 	public $imgPathLoads = 'images/loads';
 	public $imgAttachPathLoadsDst = 'D:/WWW/htdocs/1/images/loads';
+	public $loadsExcludeID = '';
 	public $publDefaultCategoryId = '25';
 	public $publDefaultUserId = '972';
 	public $publFeatured = '1';
@@ -49,6 +52,7 @@ class ConverterConfig {
 	public $publIntroLimit = '400';
 	public $imgPathPubl = 'images/posts';
 	public $imgAttachPathPublDst = 'D:/WWW/htdocs/1/images/publ';
+	public $publExcludeID = '';
 	public $skipRegistered = '0';
 	public $skipBanned = '1';
 	public $requirePassReset = '1';

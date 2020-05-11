@@ -300,6 +300,16 @@
 			   class="span12"
 			   required="true"
 		/>
+
+		<field name="blogExcludeID"
+			   type="textarea"
+			   label="INSTL_EXCLUDE_ID_LABEL"
+			   description="INSTL_EXCLUDE_ID_DESC"
+			   rows="2"
+			   cols="30"
+			   class="span12"
+			   spellcheck="false"
+		/>
 	</fieldset>
 
 	<fieldset name="news" addfieldpath="ucoz_converter/model/fields/">
@@ -374,6 +384,16 @@
 			   description="INSTL_IMGATTACH_PATH_DEST_DESC"
 			   class="span12"
 			   required="true"
+		/>
+
+		<field name="newsExcludeID"
+			   type="textarea"
+			   label="INSTL_EXCLUDE_ID_LABEL"
+			   description="INSTL_EXCLUDE_ID_DESC"
+			   rows="2"
+			   cols="30"
+			   class="span12"
+			   spellcheck="false"
 		/>
 	</fieldset>
 
@@ -450,6 +470,16 @@
 			   class="span12"
 			   required="true"
 		/>
+
+		<field name="loadsExcludeID"
+			   type="textarea"
+			   label="INSTL_EXCLUDE_ID_LABEL"
+			   description="INSTL_EXCLUDE_ID_DESC"
+			   rows="2"
+			   cols="30"
+			   class="span12"
+			   spellcheck="false"
+		/>
 	</fieldset>
 
 	<fieldset name="publ" addfieldpath="ucoz_converter/model/fields/">
@@ -525,6 +555,16 @@
 			   class="span12"
 			   required="true"
 		/>
+
+		<field name="publExcludeID"
+			   type="textarea"
+			   label="INSTL_EXCLUDE_ID_LABEL"
+			   description="INSTL_EXCLUDE_ID_DESC"
+			   rows="2"
+			   cols="30"
+			   class="span12"
+			   spellcheck="false"
+		/>
 	</fieldset>
 
 	<fieldset name="users">
@@ -581,11 +621,16 @@
 		</field>
 
 		<field name="isComprofiler"
-			   type="checkbox"
+			   type="radio"
 			   label="INSTL_EXTRA_FIELDS_COMPROFILER_LABEL"
 			   description="INSTL_EXTRA_FIELDS_COMPROFILER_DESC"
-			   value="0"
-		/>
+			   class="btn-group"
+			   default="0"
+			   filter="integer"
+		>
+			<option value="1">JYES</option>
+			<option value="0">JNO</option>
+		</field>
 
 		<field name="userfields"
 			   type="repeatable"

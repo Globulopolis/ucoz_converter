@@ -151,6 +151,11 @@ class ConverterHelper
 			$config->usergroups = array_combine($config->usergroups->usergroups_ucoz, $config->usergroups->usergroups_joomla);
 		}
 
+		$config->blogExcludeID  = !empty($config->blogExcludeID) ? implode(',', json_decode($config->blogExcludeID)) : '';
+		$config->newsExcludeID  = !empty($config->newsExcludeID) ? implode(',', json_decode($config->newsExcludeID)) : '';
+		$config->loadsExcludeID = !empty($config->loadsExcludeID) ? implode(',', json_decode($config->loadsExcludeID)) : '';
+		$config->publExcludeID  = !empty($config->publExcludeID) ? implode(',', json_decode($config->publExcludeID)) : '';
+
 		return $registry->loadObject($config);
 	}
 

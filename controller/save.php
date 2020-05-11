@@ -7,10 +7,12 @@
  * @url        http://киноархив.com
  */
 
+use Joomla\Utilities\ArrayHelper;
+
 defined('_JEXEC') or die;
 
 /**
- * Controller class to set the site data for the Joomla Installer.
+ * Controller class to set the site data for the converter.
  *
  * @since  3.1
  */
@@ -37,9 +39,8 @@ class InstallationControllerSave extends JControllerBase
 		$model = new InstallationModelSetup;
 
 		// Check the form
-		$model  = new InstallationModelSetup;
-		$data   = $app->input->post->get('jform', array(), 'array');
-		$form   = $model->getForm();
+		$data  = $app->input->post->get('jform', array(), 'array');
+		$form  = $model->getForm();
 
 		if (!$form)
 		{
@@ -66,6 +67,39 @@ class InstallationControllerSave extends JControllerBase
 			$data['imgAttachPathLoadsDst'] = rtrim($data['imgAttachPathLoadsDst'], $charlist);
 			$data['imgPathPubl'] = rtrim($data['imgPathPubl'], $charlist);
 			$data['imgAttachPathPublDst'] = rtrim($data['imgAttachPathPublDst'], $charlist);
+
+			// Convert list of comma separated IDs to JSON
+			if (!empty($blogExcludeID))
+			{
+				$blogExcludeID         = explode(',', $data['blogExcludeID']);
+				$blogExcludeID         = ArrayHelper::arrayUnique($blogExcludeID);
+				$blogExcludeID         = ArrayHelper::toInteger($blogExcludeID);
+				$data['blogExcludeID'] = json_encode($blogExcludeID);
+			}
+
+			if (!empty($newsExcludeID))
+			{
+				$newsExcludeID         = explode(',', $data['newsExcludeID']);
+				$newsExcludeID         = ArrayHelper::arrayUnique($newsExcludeID);
+				$newsExcludeID         = ArrayHelper::toInteger($newsExcludeID);
+				$data['newsExcludeID'] = json_encode($newsExcludeID);
+			}
+
+			if (!empty($loadsExcludeID))
+			{
+				$loadsExcludeID         = explode(',', $data['loadsExcludeID']);
+				$loadsExcludeID         = ArrayHelper::arrayUnique($loadsExcludeID);
+				$loadsExcludeID         = ArrayHelper::toInteger($loadsExcludeID);
+				$data['loadsExcludeID'] = json_encode($loadsExcludeID);
+			}
+
+			if (!empty($publExcludeID))
+			{
+				$publExcludeID         = explode(',', $data['publExcludeID']);
+				$publExcludeID         = ArrayHelper::arrayUnique($publExcludeID);
+				$publExcludeID         = ArrayHelper::toInteger($publExcludeID);
+				$data['publExcludeID'] = json_encode($publExcludeID);
+			}
 
 			$model->writeConfigFile($data);
 			$app->enqueueMessage(JText::_('INSTL_CONFIG_SAVE_SUCCESS'));

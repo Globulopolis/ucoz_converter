@@ -74,14 +74,14 @@ class InstallationFormFieldLanguage extends JFormFieldList
 			}
 		}
 
-		if (!$options || $options  instanceof Exception)
+		if (!$options || $options instanceof Exception)
 		{
 			$options = array();
 		}
 		// Sort languages by name
 		else
 		{
-			usort($options, array($this, '_sortLanguages'));
+			usort($options, array($this, 'sortLanguages'));
 		}
 
 		// Set the default value from the native language.
@@ -103,7 +103,7 @@ class InstallationFormFieldLanguage extends JFormFieldList
 	 *
 	 * @since   3.1
 	 */
-	protected function _sortLanguages($a, $b)
+	protected function sortLanguages($a, $b)
 	{
 		return strcmp($a['text'], $b['text']);
 	}

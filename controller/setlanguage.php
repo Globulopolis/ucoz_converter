@@ -10,7 +10,7 @@
 defined('_JEXEC') or die;
 
 /**
- * Controller class to set the language for the Joomla Installer.
+ * Controller class to set the language for the converter.
  *
  * @since  3.1
  */

@@ -10,7 +10,7 @@
 defined('_JEXEC') or die;
 
 /**
- * Default controller class for the Joomla Installer.
+ * Default controller class for the converter.
  *
  * @since  3.1
  */
